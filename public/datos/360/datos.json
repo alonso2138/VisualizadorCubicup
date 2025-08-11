@@ -1,0 +1,55 @@
+[
+    {
+        "name": "scene",
+        "type": "image",
+        "base": "Base",
+        "customs": ["Esfera"],
+        "materials":
+        {
+            "custom": "Esfera",
+            "materials": ["Azul", "Rojo"]
+        },
+
+        "resources":
+        [
+            {   
+                "name": "Base",
+                "type": "cubeTexture",
+                "path": [
+                    "datos/360/scene/Base/px.jpg",
+                    "datos/360/scene/Base/nx.jpg",
+                    "datos/360/scene/Base/py.jpg",
+                    "datos/360/scene/Base/ny.jpg",
+                    "datos/360/scene/Base/pz.jpg",
+                    "datos/360/scene/Base/nz.jpg"
+                ]
+            },
+            {   
+                "name": "Esfera_Azul",
+                "type": "cubeTexture",
+                "path": [
+                    "datos/360/scene/Esfera/Esfera-Azul/px.png",
+                    "datos/360/scene/Esfera/Esfera-Azul/nx.png",
+                    "datos/360/scene/Esfera/Esfera-Azul/py.png",
+                    "datos/360/scene/Esfera/Esfera-Azul/ny.png",
+                    "datos/360/scene/Esfera/Esfera-Azul/pz.png",
+                    "datos/360/scene/Esfera/Esfera-Azul/nz.png"
+                ]
+            },
+            {   
+                "name": "Esfera_Rojo",
+                "type": "cubeTexture",
+                "path": [
+                    "datos/360/scene/Esfera/Esfera-Rojo/px.png",
+                    "datos/360/scene/Esfera/Esfera-Rojo/nx.png",
+                    "datos/360/scene/Esfera/Esfera-Rojo/py.png",
+                    "datos/360/scene/Esfera/Esfera-Rojo/ny.png",
+                    "datos/360/scene/Esfera/Esfera-Rojo/pz.png",
+                    "datos/360/scene/Esfera/Esfera-Rojo/nz.png"
+                ]
+            }
+        ]
+    }
+]
+
+

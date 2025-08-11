@@ -1,0 +1,17 @@
+{
+  "experienceId": "Neutrals",
+  "createdAt": "2025-08-11T15:09:39.561Z",
+  "presets": [
+    [
+      {
+        "uuid": "Muro_básico_P_TABIQUE_PLADUR_48_WR_6824911001",
+        "sku": "0358401839213"
+      },
+      {
+        "uuid": "Suelo_Porcelánico_6834061001",
+        "sku": "VANOGR2020"
+      }
+    ]
+  ],
+  "createdBy": "user"
+}

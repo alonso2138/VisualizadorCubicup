@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administrador</title>
+    <link rel="stylesheet" href="/admin/styles/index.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- El contenido se genera dinámicamente desde main.js -->
+    
+    <!-- Three.js Libraries for 3D Preview -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    
+    <!-- Ensure OrbitControls and GLTFLoader are properly attached to THREE -->
+    <script>
+        // Wait for Three.js to load and then ensure controls are available
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if OrbitControls loaded correctly
+            if (typeof THREE !== 'undefined') {                
+                // Try to ensure OrbitControls is available
+                if (!THREE.OrbitControls && window.THREE && window.THREE.OrbitControls) {
+                    THREE.OrbitControls = window.THREE.OrbitControls;
+                }
+                
+                // Try to ensure GLTFLoader is available
+                if (!THREE.GLTFLoader && window.THREE && window.THREE.GLTFLoader) {
+                    THREE.GLTFLoader = window.THREE.GLTFLoader;
+                }
+            } else {
+            }
+        });
+    </script>
+    
+    <script type="module">
+        import AdminInterface from '/admin/main.js';
+        
+        // Prevent multiple instances
+        if (!window.adminInterface) {
+            window.adminInterface = new AdminInterface();
+        }
+    </script>
+</body>
+</html>

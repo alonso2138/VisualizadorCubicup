@@ -1,0 +1,115 @@
+{
+  "modelPath": "/uploads/RawColors.glb",
+  "groups": [
+    {
+      "id": "1747821017754",
+      "name": "Desagues",
+      "family": "Metal",
+      "objects": [
+        {
+          "uuid": "b26c79d0-ce3f-40d2-ae0f-7c95b6f6661c",
+          "name": "DUCHA_GRIF_EMPOTRADA_PLATO_90_x_160_CM_2_6827589002"
+        },
+        {
+          "uuid": "38e607c8-f836-42d8-8bc3-68d6bf2c416e",
+          "name": "LAVABO_80_CM_-_GRIF_EMPOTRADA_6866239003"
+        }
+      ]
+    },
+    {
+      "id": "1747821022767",
+      "name": "Suelo",
+      "family": "Suelo",
+      "objects": [
+        {
+          "uuid": "79c12e2f-6221-4f97-a399-204916fc31d5",
+          "name": "Suelo_Porcelánico_6834061001"
+        }
+      ]
+    },
+    {
+      "id": "1747821028000",
+      "name": "Paredes",
+      "family": "Pared",
+      "objects": [
+        {
+          "uuid": "cd1ff26f-dd3e-4b1d-90e9-559a1d57bc09",
+          "name": "Muro_básico_P_TABIQUE_PLADUR_48_WR_6824911001"
+        }
+      ]
+    },
+    {
+      "id": "1747821032523",
+      "name": "Alicatado",
+      "family": "Alicatado",
+      "objects": [
+        {
+          "uuid": "e5032b4b-8d13-41e3-9bbb-280563bfa854",
+          "name": "Muro_básico_P_TABIQUE_PLADUR_48_WR_6824911002"
+        }
+      ]
+    },
+    {
+      "id": "1747821039429",
+      "name": "Grifería",
+      "family": "Cobre",
+      "objects": [
+        {
+          "uuid": "896d2fb0-76c4-417c-b2e3-6715e97cef1d",
+          "name": "zzROCIADOR_ROCIADOR_6827591"
+        },
+        {
+          "uuid": "1300be75-6183-46d4-acc2-3df74c7be185",
+          "name": "LAVABO_80_CM_-_GRIF_EMPOTRADA_6866239001"
+        }
+      ]
+    },
+    {
+      "id": "1747821051285",
+      "name": "Suelo ducha",
+      "family": "SueloDucha",
+      "objects": [
+        {
+          "uuid": "390e8b00-d9a2-42d1-a378-c3834a6504f7",
+          "name": "DUCHA_GRIF_EMPOTRADA_PLATO_90_x_160_CM_2_6827589"
+        }
+      ]
+    },
+    {
+      "id": "1747821058416",
+      "name": "Mampara ducha",
+      "family": "Mampara",
+      "objects": [
+        {
+          "uuid": "cdd787cf-1d63-4f40-be14-b39023ea1cc1",
+          "name": "Panel_del_sistema_Vidriado_6867328"
+        }
+      ]
+    },
+    {
+      "id": "1747821066745",
+      "name": "Lavabo encimera",
+      "family": "Encimera lavabo",
+      "objects": [
+        {
+          "uuid": "2fbefa6a-354a-4cf4-8caa-33b83fc6516c",
+          "name": "LAVABO_80_CM_-_GRIF_EMPOTRADA_6866239002"
+        }
+      ]
+    },
+    {
+      "id": "1747821071887",
+      "name": "Lavabo cuerpo",
+      "family": "Plastico",
+      "objects": [
+        {
+          "uuid": "72c82dcf-f2f8-49b3-aa92-d42936bd0001",
+          "name": "LAVABO_80_CM_-_GRIF_EMPOTRADA_6866239"
+        }
+      ]
+    }
+  ],
+  "ceilingHeight": 1.5,
+  "name": "RawColors",
+  "date": "2025-05-21T09:51:23.819Z"
+}

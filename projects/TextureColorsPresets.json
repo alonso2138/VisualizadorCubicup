@@ -1,0 +1,277 @@
+{
+  "Presets": {
+    "1": [
+      {
+        "targetTxt": "Metal009_Color",
+        "objects": [
+          {
+            "uuid": "b26c79d0-ce3f-40d2-ae0f-7c95b6f6661c",
+            "name": "DUCHA_GRIF_EMPOTRADA_PLATO_90_x_160_CM_2_6827589002"
+          },
+          {
+            "uuid": "38e607c8-f836-42d8-8bc3-68d6bf2c416e",
+            "name": "LAVABO_80_CM_-_GRIF_EMPOTRADA_6866239003"
+          }
+        ]
+      },
+      {
+        "targetTxt": "0178690014722",
+        "objects": [
+          {
+            "uuid": "79c12e2f-6221-4f97-a399-204916fc31d5",
+            "name": "Suelo_Porcelánico_6834061001"
+          }
+        ]
+      },
+      {
+        "targetTxt": "0178690014722",
+        "objects": [
+          {
+            "uuid": "cd1ff26f-dd3e-4b1d-90e9-559a1d57bc09",
+            "name": "Muro_básico_P_TABIQUE_PLADUR_48_WR_6824911001"
+          }
+        ]
+      },
+      {
+        "targetTxt": "0173800011260",
+        "objects": [
+          {
+            "uuid": "e5032b4b-8d13-41e3-9bbb-280563bfa854",
+            "name": "Muro_básico_P_TABIQUE_PLADUR_48_WR_6824911002"
+          }
+        ]
+      },
+      {
+        "targetTxt": "Black Gun Metal (PVD)",
+        "objects": [
+          {
+            "uuid": "896d2fb0-76c4-417c-b2e3-6715e97cef1d",
+            "name": "zzROCIADOR_ROCIADOR_6827591"
+          },
+          {
+            "uuid": "1300be75-6183-46d4-acc2-3df74c7be185",
+            "name": "LAVABO_80_CM_-_GRIF_EMPOTRADA_6866239001"
+          }
+        ]
+      },
+      {
+        "targetTxt": "BP282",
+        "objects": [
+          {
+            "uuid": "390e8b00-d9a2-42d1-a378-c3834a6504f7",
+            "name": "DUCHA_GRIF_EMPOTRADA_PLATO_90_x_160_CM_2_6827589"
+          }
+        ]
+      },
+      {
+        "targetTxt": "Cristal",
+        "objects": [
+          {
+            "uuid": "cdd787cf-1d63-4f40-be14-b39023ea1cc1",
+            "name": "Panel_del_sistema_Vidriado_6867328"
+          }
+        ]
+      },
+      {
+        "targetTxt": "PU194",
+        "objects": [
+          {
+            "uuid": "2fbefa6a-354a-4cf4-8caa-33b83fc6516c",
+            "name": "LAVABO_80_CM_-_GRIF_EMPOTRADA_6866239002"
+          }
+        ]
+      },
+      {
+        "targetTxt": "",
+        "objects": [
+          {
+            "uuid": "72c82dcf-f2f8-49b3-aa92-d42936bd0001",
+            "name": "LAVABO_80_CM_-_GRIF_EMPOTRADA_6866239"
+          }
+        ]
+      }
+    ],
+    "2": [
+      {
+        "targetTxt": "Metal009_Color",
+        "objects": [
+          {
+            "uuid": "b26c79d0-ce3f-40d2-ae0f-7c95b6f6661c",
+            "name": "DUCHA_GRIF_EMPOTRADA_PLATO_90_x_160_CM_2_6827589002"
+          },
+          {
+            "uuid": "38e607c8-f836-42d8-8bc3-68d6bf2c416e",
+            "name": "LAVABO_80_CM_-_GRIF_EMPOTRADA_6866239003"
+          }
+        ]
+      },
+      {
+        "targetTxt": "0172400020332",
+        "objects": [
+          {
+            "uuid": "79c12e2f-6221-4f97-a399-204916fc31d5",
+            "name": "Suelo_Porcelánico_6834061001"
+          }
+        ]
+      },
+      {
+        "targetTxt": "0172400020332",
+        "objects": [
+          {
+            "uuid": "cd1ff26f-dd3e-4b1d-90e9-559a1d57bc09",
+            "name": "Muro_básico_P_TABIQUE_PLADUR_48_WR_6824911001"
+          }
+        ]
+      },
+      {
+        "targetTxt": "A036709 · R59",
+        "objects": [
+          {
+            "uuid": "e5032b4b-8d13-41e3-9bbb-280563bfa854",
+            "name": "Muro_básico_P_TABIQUE_PLADUR_48_WR_6824911002"
+          }
+        ]
+      },
+      {
+        "targetTxt": "cromo",
+        "objects": [
+          {
+            "uuid": "896d2fb0-76c4-417c-b2e3-6715e97cef1d",
+            "name": "zzROCIADOR_ROCIADOR_6827591"
+          },
+          {
+            "uuid": "1300be75-6183-46d4-acc2-3df74c7be185",
+            "name": "LAVABO_80_CM_-_GRIF_EMPOTRADA_6866239001"
+          }
+        ]
+      },
+      {
+        "targetTxt": "HU455",
+        "objects": [
+          {
+            "uuid": "390e8b00-d9a2-42d1-a378-c3834a6504f7",
+            "name": "DUCHA_GRIF_EMPOTRADA_PLATO_90_x_160_CM_2_6827589"
+          }
+        ]
+      },
+      {
+        "targetTxt": "Cristal",
+        "objects": [
+          {
+            "uuid": "cdd787cf-1d63-4f40-be14-b39023ea1cc1",
+            "name": "Panel_del_sistema_Vidriado_6867328"
+          }
+        ]
+      },
+      {
+        "targetTxt": "PU194",
+        "objects": [
+          {
+            "uuid": "2fbefa6a-354a-4cf4-8caa-33b83fc6516c",
+            "name": "LAVABO_80_CM_-_GRIF_EMPOTRADA_6866239002"
+          }
+        ]
+      },
+      {
+        "targetTxt": "",
+        "objects": [
+          {
+            "uuid": "72c82dcf-f2f8-49b3-aa92-d42936bd0001",
+            "name": "LAVABO_80_CM_-_GRIF_EMPOTRADA_6866239"
+          }
+        ]
+      }
+    ],
+    "3": [
+      {
+        "targetTxt": "Metal009_Color",
+        "objects": [
+          {
+            "uuid": "b26c79d0-ce3f-40d2-ae0f-7c95b6f6661c",
+            "name": "DUCHA_GRIF_EMPOTRADA_PLATO_90_x_160_CM_2_6827589002"
+          },
+          {
+            "uuid": "38e607c8-f836-42d8-8bc3-68d6bf2c416e",
+            "name": "LAVABO_80_CM_-_GRIF_EMPOTRADA_6866239003"
+          }
+        ]
+      },
+      {
+        "targetTxt": "60001453",
+        "objects": [
+          {
+            "uuid": "79c12e2f-6221-4f97-a399-204916fc31d5",
+            "name": "Suelo_Porcelánico_6834061001"
+          }
+        ]
+      },
+      {
+        "targetTxt": "0316270023336",
+        "objects": [
+          {
+            "uuid": "cd1ff26f-dd3e-4b1d-90e9-559a1d57bc09",
+            "name": "Muro_básico_P_TABIQUE_PLADUR_48_WR_6824911001"
+          }
+        ]
+      },
+      {
+        "targetTxt": "0278900022980",
+        "objects": [
+          {
+            "uuid": "e5032b4b-8d13-41e3-9bbb-280563bfa854",
+            "name": "Muro_básico_P_TABIQUE_PLADUR_48_WR_6824911002"
+          }
+        ]
+      },
+      {
+        "targetTxt": "Black Gun Metal (PVD)",
+        "objects": [
+          {
+            "uuid": "896d2fb0-76c4-417c-b2e3-6715e97cef1d",
+            "name": "zzROCIADOR_ROCIADOR_6827591"
+          },
+          {
+            "uuid": "1300be75-6183-46d4-acc2-3df74c7be185",
+            "name": "LAVABO_80_CM_-_GRIF_EMPOTRADA_6866239001"
+          }
+        ]
+      },
+      {
+        "targetTxt": "BL286",
+        "objects": [
+          {
+            "uuid": "390e8b00-d9a2-42d1-a378-c3834a6504f7",
+            "name": "DUCHA_GRIF_EMPOTRADA_PLATO_90_x_160_CM_2_6827589"
+          }
+        ]
+      },
+      {
+        "targetTxt": "Cristal",
+        "objects": [
+          {
+            "uuid": "cdd787cf-1d63-4f40-be14-b39023ea1cc1",
+            "name": "Panel_del_sistema_Vidriado_6867328"
+          }
+        ]
+      },
+      {
+        "targetTxt": "Negro mate",
+        "objects": [
+          {
+            "uuid": "2fbefa6a-354a-4cf4-8caa-33b83fc6516c",
+            "name": "LAVABO_80_CM_-_GRIF_EMPOTRADA_6866239002"
+          }
+        ]
+      },
+      {
+        "targetTxt": "",
+        "objects": [
+          {
+            "uuid": "72c82dcf-f2f8-49b3-aa92-d42936bd0001",
+            "name": "LAVABO_80_CM_-_GRIF_EMPOTRADA_6866239"
+          }
+        ]
+      }
+    ]
+  }
+}

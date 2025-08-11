@@ -1,0 +1,16 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  user-select: auto ;
+}
+
+#app {
+  top: 0;
+  left: 0;
+  outline: none;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(ellipse at center, #303030 0%, #1a1a1a 100%);
+}

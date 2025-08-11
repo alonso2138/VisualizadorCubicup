@@ -1,0 +1,40 @@
+[
+    {
+        "type":"model",
+        "resources":
+                    [
+                        {   
+                            "name": "envMap",
+                            "type": "cubeTexture",
+                            "path": [
+                                "envMap/px.jpg",
+                                "envMap/nx.jpg",
+                                "envMap/py.jpg",
+                                "envMap/ny.jpg",
+                                "envMap/pz.jpg",
+                                "envMap/nz.jpg"
+                            ]
+                        },
+                        {
+                            "name": "modeloBase",
+                            "type": "gltfModel",
+                            "path": "models/bano/bano_dae.glb"
+                        },
+                        {
+                            "name": "madera_Color",
+                            "type": "texture",
+                            "path": "models/mono/texturas/madera/color.jpg"
+                        },
+                        {
+                            "name": "madera_Normal",
+                            "type": "texture",
+                            "path": "models/mono/texturas/madera/normal.jpg"
+                        },
+                        {
+                            "name": "madera_Roughness",
+                            "type": "texture",
+                            "path": "models/mono/texturas/madera/roughness.jpg"
+                        }
+                ]
+    }
+]

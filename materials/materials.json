@@ -1,0 +1,163 @@
+{
+  "materials": {
+    "0278900022977": {
+      "tipo": "textura",
+      "nombre": "Azulejo amarillo",
+      "etiquetas": [
+        "baño"
+      ],
+      "formato": "60x60",
+      "generatePBR": true,
+      "files": {
+        "color": "0278900022977_Color.png"
+      },
+      "pbrSettings": {
+        "metalness": 0.25,
+        "roughness": 0.55,
+        "normalScale": 1.1,
+        "aoIntensity": 0.4,
+        "enableNormal": true,
+        "enableRoughness": true,
+        "enableMetalness": true,
+        "enableAO": true,
+        "updatedAt": "2025-08-02T14:41:30.220Z",
+        "enableColor": true
+      },
+      "createdAt": "2025-07-11T07:42:50.290Z",
+      "updatedAt": "2025-07-22T15:11:23.540Z"
+    },
+    "VANOGR2020": {
+      "tipo": "textura",
+      "nombre": "VANOGR2020",
+      "etiquetas": [
+        "baños",
+        "alicatado decorativo",
+        "blanco"
+      ],
+      "generatePBR": true,
+      "files": {
+        "color": "VANOGR2020_Color.png"
+      },
+      "createdAt": "2025-07-11T07:42:54.729Z",
+      "updatedAt": "2025-08-02T22:44:31.144Z",
+      "formato": "60x60",
+      "acabado": "Mate",
+      "pbrSettings": {
+        "metalness": 0.11,
+        "roughness": 0.63,
+        "normalScale": 0.8,
+        "aoIntensity": 1.2,
+        "enableNormal": true,
+        "enableRoughness": true,
+        "enableMetalness": true,
+        "enableAO": true,
+        "updatedAt": "2025-08-01T15:46:52.039Z",
+        "enableColor": true
+      },
+      "previewConfig": {
+        "updatedAt": "2025-07-22T17:13:07.609Z"
+      }
+    },
+    "madera": {
+      "nombre": "madera",
+      "color": "",
+      "formato": "60x60",
+      "hashtags": [
+        "blablabla"
+      ],
+      "etiquetas": [
+        "blablabla"
+      ],
+      "objetos_recomendados": [],
+      "tipo": "textura",
+      "files": {
+        "color": "madera_Color.png",
+        "metalness": "madera_Metalness.jpg",
+        "normal": "madera_Normal.jpg",
+        "roughness": "madera_Roughness.jpg"
+      },
+      "pbrSettings": {
+        "metalness": 0.16,
+        "roughness": 0.71,
+        "normalScale": 1.1,
+        "aoIntensity": 0,
+        "enableNormal": true,
+        "enableRoughness": true,
+        "enableMetalness": true,
+        "enableAO": true,
+        "enableColor": true,
+        "updatedAt": "2025-08-03T16:49:09.054Z"
+      },
+      "createdAt": "2025-08-03T16:49:15.809Z",
+      "updatedAt": "2025-08-03T16:49:15.809Z"
+    },
+    "0350901839213": {
+      "nombre": "0350901839213",
+      "color": "",
+      "formato": "60x60",
+      "hashtags": [
+        "blabla"
+      ],
+      "etiquetas": [
+        "blabla"
+      ],
+      "objetos_recomendados": [],
+      "tipo": "textura",
+      "files": {
+        "color": "0350901839213_Color.png",
+        "metalness": "0350901839213_Metalness.jpg",
+        "normal": "0350901839213_Normal.jpg",
+        "roughness": "0350901839213_Roughness.jpg"
+      },
+      "pbrSettings": {
+        "metalness": 0.17,
+        "roughness": 0.8,
+        "normalScale": 1,
+        "aoIntensity": 0,
+        "enableNormal": true,
+        "enableRoughness": true,
+        "enableMetalness": true,
+        "enableAO": true,
+        "enableColor": true,
+        "updatedAt": "2025-08-05T10:06:58.159Z"
+      },
+      "createdAt": "2025-08-05T10:06:16.030Z",
+      "updatedAt": "2025-08-05T10:06:16.030Z"
+    },
+    "0358401839213": {
+      "nombre": "0358401839213",
+      "color": "",
+      "formato": "60x60",
+      "hashtags": [
+        "calacatas",
+        "baño"
+      ],
+      "etiquetas": [
+        "calacatas",
+        "baño"
+      ],
+      "objetos_recomendados": [],
+      "tipo": "textura",
+      "files": {
+        "color": "0358401839213_Color.png",
+        "metalness": "0358401839213_Metalness.jpg",
+        "normal": "0358401839213_Normal.jpg",
+        "roughness": "0358401839213_Roughness.jpg"
+      },
+      "pbrSettings": {
+        "metalness": 1,
+        "roughness": 1,
+        "normalScale": 0.1,
+        "aoIntensity": 0,
+        "enableNormal": true,
+        "enableRoughness": true,
+        "enableMetalness": true,
+        "enableAO": true,
+        "enableColor": true,
+        "updatedAt": "2025-08-11T14:08:40.469Z"
+      },
+      "createdAt": "2025-08-07T16:42:00.999Z",
+      "updatedAt": "2025-08-07T16:42:00.999Z"
+    }
+  }
+}
