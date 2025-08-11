@@ -1,6 +1,6 @@
-import { MaterialUploader } from '/admin/modules/MaterialUploader.js';
-import { ExperienceManager } from '/admin/modules/ExperienceManagerModular.js';
-import { UIComponents } from '/admin/modules/UIComponents.js';
+import { MaterialUploader } from './modules/MaterialUploader.js';
+import { ExperienceManager } from './modules/ExperienceManagerModular.js';
+import { UIComponents } from './modules/UIComponents.js';
 
 export default class AdminInterface {
     constructor() {
