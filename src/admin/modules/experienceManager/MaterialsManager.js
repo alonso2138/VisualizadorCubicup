@@ -218,12 +218,12 @@ export class MaterialsManager {
                 </div>
                 <div class="material-actions">
                     <button class="btn-material-action btn-preview" 
-                            onclick="window.materialsManager?.showMaterialInfo('${sku}')" 
+                            onclick="event.stopPropagation(); window.materialsManager?.showMaterialInfo('${sku}')" 
                             title="Ver información">
                         ℹ️ Info
                     </button>
                     <button class="btn-material-action btn-preview" 
-                            onclick="window.materialsManager?.showMaterialPreview('${sku}')" 
+                            onclick="event.stopPropagation(); window.materialsManager?.showMaterialPreview('${sku}')" 
                             title="Vista previa">
                         👁️ Preview
                     </button>
@@ -286,13 +286,42 @@ export class MaterialsManager {
     filterMaterials(searchTerm) {
         if (!searchTerm) {
             this.renderMaterials(this.currentMaterials);
+            this.updateMaterialsCount(this.currentMaterials.length);
             return;
         }
 
         const filtered = this.currentMaterials.filter(([sku, material]) => {
-            return sku.toLowerCase().includes(searchTerm) ||
-                   material.nombre?.toLowerCase().includes(searchTerm) ||
-                   material.color?.toLowerCase().includes(searchTerm);
+            console.log(material)
+            // Helper function to recursively search through object properties
+            const searchInObject = (obj, term) => {
+                if (obj === null || obj === undefined) return false;
+                
+                if (typeof obj === 'string') {
+                    return obj.toLowerCase().includes(term);
+                }
+                
+                if (typeof obj === 'number') {
+                    return obj.toString().includes(term);
+                }
+                
+                if (Array.isArray(obj)) {
+                    return obj.some(item => searchInObject(item, term));
+                }
+                
+                if (typeof obj === 'object') {
+                    return Object.values(obj).some(value => searchInObject(value, term));
+                }
+                
+                return false;
+            };
+
+            // Search in SKU first
+            if (sku.toLowerCase().includes(searchTerm)) {
+                return true;
+            }
+
+            // Search recursively through all material properties
+            return searchInObject(material, searchTerm);
         });
 
         this.renderMaterials(filtered);

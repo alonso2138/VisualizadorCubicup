@@ -170,6 +170,9 @@ export default class Presets {
             });
         }
 
+        // Clean also the link selection 
+        window.experience.clientInterface.selection = [];
+
         // Group uuids by sku to reduce fetch calls
         const mapBySku = new Map();
         presetArray.forEach(({ uuid, sku }) => {

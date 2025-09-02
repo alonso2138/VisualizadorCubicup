@@ -49,10 +49,10 @@ export default class AdminInterface {
                         </div>
                         <div class="header-actions">
                             <button class="btn btn-primary" data-action="create-experience">
-                                Crear experiencia
+                                Subir modelo
                             </button>
                             <button class="btn btn-secondary" data-action="material-uploader">
-                                Subidor de materiales
+                                Subir materiales
                             </button>
                         </div>
                     </div>
@@ -84,8 +84,7 @@ export default class AdminInterface {
         container.innerHTML = `
             <div class="dashboard">
                 <div class="dashboard-header">
-                    <h2>Experiencias en línea</h2>
-                    <p class="dashboard-subtitle">Actualmente no hay ninguna experiencia en línea</p>
+                    <h2>Modelos en línea</h2>
                 </div>
 
                 <div class="experiences-grid" id="experiencesGrid">
@@ -127,6 +126,10 @@ export default class AdminInterface {
                     
                 case 'view-experience':
                     this.experienceManager.showExperienceDetails(e.target.dataset.id);
+                    break;
+         
+                case 'edit-experience':
+                    this.experienceManager.showEditExperienceModal(e.target.dataset.id);
                     break;
                     
                 case 'back-to-dashboard':

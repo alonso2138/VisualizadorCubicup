@@ -3,6 +3,7 @@ import ModelLoader from './utils/ModelLoader.js';
 import EventEmitter from '../Utils/EventEmitter.js';
 import PropiedadesMateriales from './PropiedadesMateriales.js';
 import { MaterialsManager } from './components/MaterialsManager.js';
+import SendProjectData from './components/SendProjectData.js';
 
 export default class ClientInterface extends EventEmitter {
     constructor(experience, options = {}) {
@@ -13,6 +14,8 @@ export default class ClientInterface extends EventEmitter {
         this.modelLoader = new ModelLoader(this.experience);
         if(this.options.PropiedadesMateriales) this.PropiedadesMateriales = new PropiedadesMateriales();
         
+        this.selection = [];
+
         this.configDir = new URLSearchParams(window.location.search).get('project')
         this.mainContainers = [];
 
@@ -28,11 +31,660 @@ export default class ClientInterface extends EventEmitter {
         this.materialsManager = new MaterialsManager();
         this.setupMaterialsIntegration();
         
+        // Initialize SendProjectData component
+        this.sendProjectData = new SendProjectData(this);
+        
         // Undo system
         this.actionHistory = [];
         this.maxHistorySize = 20;
         this.setupUndoSystem();
+        
+        // PBR state flag for performance control
+        this.pbrEnabled = false;
+        
+        // Material history tracking for PBR control
+        this.appliedMaterialsHistory = [];
     }
+
+    setupMaterialsIntegration() {
+        // Make materialsManager globally accessible for the modal buttons
+        window.materialsManager = this.materialsManager;
+        
+        // Make setPBR globally accessible for debugging
+        window.setPBR = (state) => this.setPBR(state);
+        window.togglePBR = () => this.togglePBR();
+        
+        // Setup the materials modal
+        this.materialsManager.setupMaterialsModal();
+        
+        // Create materials button in the UI
+        this.createMaterialsButton();
+        
+        // Override material application to work with ClientInterface
+        this.customizeMaterialsManagerForClient();
+
+        // Load materials
+        this.materialsManager.loadMaterials();
+    }
+
+    
+    createMaterialsButton() {
+        // Create floating button for materials
+        const materialsBtn = document.createElement('button');
+        materialsBtn.id = 'showMaterialsBtn';
+        materialsBtn.className = 'floating-materials-btn';
+        materialsBtn.innerHTML = '📚 Materiales';
+        materialsBtn.title = 'Abrir catálogo de materiales';
+        
+        // Style the button
+        materialsBtn.style.position = 'fixed';
+        materialsBtn.style.top = '20px';
+        materialsBtn.style.right = '20px';
+        materialsBtn.style.zIndex = '1000';
+        materialsBtn.style.padding = '12px 20px';
+        materialsBtn.style.background = 'var(--mm-panel)';
+        materialsBtn.style.color = 'white';
+        materialsBtn.style.border = 'none';
+        materialsBtn.style.borderRadius = '25px';
+        materialsBtn.style.cursor = 'pointer';
+        materialsBtn.style.fontSize = '14px';
+        materialsBtn.style.fontWeight = 'bold';
+        materialsBtn.style.boxShadow = '0 4px 12px rgba(143, 92, 255, 0.3)';
+        materialsBtn.style.transition = 'all 0.3s ease';
+        
+        // Add hover effects
+        materialsBtn.addEventListener('mouseenter', () => {
+            materialsBtn.style.background = 'var(--mm-panel)';
+            materialsBtn.style.transform = 'translateY(-2px)';
+            materialsBtn.style.boxShadow = '0 6px 16px rgba(143, 92, 255, 0.4)';
+        });
+        
+        materialsBtn.addEventListener('mouseleave', () => {
+            materialsBtn.style.background = 'var(--mm-panel)';
+            materialsBtn.style.transform = 'translateY(0)';
+            materialsBtn.style.boxShadow = '0 4px 12px rgba(143, 92, 255, 0.3)';
+        });
+
+        materialsBtn.addEventListener("click", () => {
+            document.getElementById("materialsFloatingModal").classList.toggle("hidden")
+        });
+        
+        document.body.appendChild(materialsBtn);
+        
+        // Create PBR toggle button
+        this.createPBRToggleButton();
+    }
+    
+    createPBRToggleButton() {
+        // Create floating button for PBR toggle
+        const pbrBtn = document.createElement('button');
+        pbrBtn.id = 'togglePBRBtn';
+        pbrBtn.className = 'floating-pbr-btn';
+        pbrBtn.innerHTML = this.pbrEnabled ? '✨ PBR ON' : '⚡ PBR OFF';
+        pbrBtn.title = 'Alternar PBR (Physically Based Rendering)';
+        
+        // Style the button
+        pbrBtn.style.position = 'fixed';
+        pbrBtn.style.top = '80px';  // Below the materials button
+        pbrBtn.style.right = '20px';
+        pbrBtn.style.zIndex = '1000';
+        pbrBtn.style.padding = '12px 20px';
+        pbrBtn.style.background = this.pbrEnabled ? 'var(--mm-success, #4CAF50)' : 'var(--mm-warning, #FF9800)';
+        pbrBtn.style.color = 'white';
+        pbrBtn.style.border = 'none';
+        pbrBtn.style.borderRadius = '25px';
+        pbrBtn.style.cursor = 'pointer';
+        pbrBtn.style.fontSize = '14px';
+        pbrBtn.style.fontWeight = 'bold';
+        pbrBtn.style.boxShadow = this.pbrEnabled ? 
+            '0 4px 12px rgba(76, 175, 80, 0.3)' : 
+            '0 4px 12px rgba(255, 152, 0, 0.3)';
+        pbrBtn.style.transition = 'all 0.3s ease';
+        
+        // Add hover effects
+        pbrBtn.addEventListener('mouseenter', () => {
+            pbrBtn.style.transform = 'translateY(-2px)';
+            pbrBtn.style.boxShadow = this.pbrEnabled ? 
+                '0 6px 16px rgba(76, 175, 80, 0.4)' : 
+                '0 6px 16px rgba(255, 152, 0, 0.4)';
+        });
+        
+        pbrBtn.addEventListener('mouseleave', () => {
+            pbrBtn.style.transform = 'translateY(0)';
+            pbrBtn.style.boxShadow = this.pbrEnabled ? 
+                '0 4px 12px rgba(76, 175, 80, 0.3)' : 
+                '0 4px 12px rgba(255, 152, 0, 0.3)';
+        });
+
+        pbrBtn.addEventListener("click", () => {
+            this.togglePBR();
+        });
+        
+        document.body.appendChild(pbrBtn);
+        
+        // Store reference for updates
+        this.pbrToggleBtn = pbrBtn;
+    }
+    
+    togglePBR() {
+        const newState = !this.pbrEnabled;
+        this.setPBR(newState);
+        this.updatePBRButtonUI();
+    }
+    
+    updatePBRButtonUI() {
+        if (!this.pbrToggleBtn) return;
+        
+        const btn = this.pbrToggleBtn;
+        btn.innerHTML = this.pbrEnabled ? '✨ PBR ON' : '⚡ PBR OFF';
+        btn.style.background = this.pbrEnabled ? 'var(--mm-success, #4CAF50)' : 'var(--mm-warning, #FF9800)';
+        btn.style.boxShadow = this.pbrEnabled ? 
+            '0 4px 12px rgba(76, 175, 80, 0.3)' : 
+            '0 4px 12px rgba(255, 152, 0, 0.3)';
+    }
+    
+    customizeMaterialsManagerForClient() {
+        // Store reference to original renderMaterials method
+        const originalRenderMaterials = this.materialsManager.renderMaterials.bind(this.materialsManager);
+        
+        // Override renderMaterials to add client-specific click behavior
+        this.materialsManager.renderMaterials = (materials) => {
+            originalRenderMaterials(materials);
+            
+            // Add client-specific behavior to material cards
+            this.setupClientMaterialCardBehavior();
+        };
+    }
+    
+    setupClientMaterialCardBehavior() {
+        const materialCards = document.querySelectorAll('.material-card');
+        
+        materialCards.forEach(card => {
+            // Remove existing click listeners
+            const newCard = card.cloneNode(true);
+            card.parentNode.replaceChild(newCard, card);
+            
+            // Add client-specific click behavior
+            newCard.addEventListener('click', (e) => {
+                e.stopPropagation();
+                
+                // Clear any active selection
+                this.clearActiveSelection();
+                
+                // Set up material selection mode
+                const sku = newCard.getAttribute('sku');
+                this.setupMaterialSelection(sku, newCard);
+            });
+        });
+    }
+    
+    async setupMaterialSelection(sku, materialCard) {
+        try {
+            // Get material data
+            const response = await fetch(`/api/materials/${sku}`);
+            if (!response.ok) {
+                throw new Error('Material not found');
+            }
+            
+            const materialData = await response.json();
+            
+            // Visual feedback
+            materialCard.classList.add('selecting');
+            document.body.style.cursor = 'crosshair';
+            
+            // Store active selection
+            this.activeSelection = {
+                sku: sku,
+                materialData: materialData,
+                materialCard: materialCard
+            };
+            
+            // Create next click handler
+            const nextClickHandler = (event) => {
+                event.stopPropagation();
+                this.handleMaterialApplication(event);
+            };
+            
+            // Add event listener
+            document.addEventListener('click', nextClickHandler, { once: true });
+            this.activeSelection.nextClickHandler = nextClickHandler;
+            
+        } catch (error) {
+            console.error('Error setting up material selection:', error);
+            this.showError('Error cargando material: ' + error.message);
+        }
+    }
+    
+    handleMaterialApplication(event) {
+        try {
+            // Check if we have a hovered object to apply material to
+            if (this.experience.postProcessing && this.experience.postProcessing.hoveredObject) {
+                const targetMeshes = Array.isArray(this.experience.postProcessing.hoveredObject) 
+                    ? this.experience.postProcessing.hoveredObject 
+                    : [this.experience.postProcessing.hoveredObject];
+                
+                // Apply material using the same method as the original ClientInterface
+                this.applyMaterialToHoveredObject(targetMeshes);
+                
+            } else {
+                console.warn('No hay objeto seleccionado para aplicar el material');
+                this.showWarning('Selecciona un objeto primero haciendo hover sobre él');
+            }
+        } catch (error) {
+            console.error('Error aplicando material:', error);
+            this.showError('Error aplicando material: ' + error.message);
+        } finally {
+            this.clearActiveSelection();
+        }
+    }
+    
+    applyMaterialToHoveredObject(targetMeshes) {
+        if (!this.activeSelection || !this.activeSelection.materialData) {
+            return;
+        }
+        
+        this.applySkuToMeshByUUID(this.activeSelection.sku,targetMeshes[0].name)
+
+        const materialData = this.activeSelection.materialData;
+        const materialCard = this.activeSelection.materialCard;
+
+        // Update UI
+        const allCards = document.querySelectorAll('.material-card');
+        allCards.forEach(card => card.classList.remove('selected'));
+        materialCard.classList.add('selected');
+        
+        // Show properties if available
+        if (this.PropiedadesMateriales) {
+            this.PropiedadesMateriales.showPropertyBox(this.activeSelection.sku);
+        }
+        
+        // Show success feedback
+        this.showSuccess(`Material ${materialData.nombre || this.activeSelection.sku} aplicado`);
+    }
+
+    // Apply a material by SKU to a mesh identified by UUID
+    async applySkuToMeshByUUID(sku, uuid, optionsOverride = {}) {
+        try {
+            if (!sku) throw new Error('SKU es requerido');
+            const modelRoot = this.experience?.model?.model;
+            if (!modelRoot) throw new Error('Modelo no disponible');
+            // 1) Mapear todos los objetos (meshes) en escena y sus hijos
+            const allMeshes = [];
+            modelRoot.traverse((obj) => {
+                if (obj && obj.isMesh) allMeshes.push(obj);
+            });
+
+            // 2) Intentar localizar por UUID primero
+            let mesh = null;
+            if (uuid) {
+                mesh = allMeshes.find(m => m.name === uuid) || null;
+            }
+
+            // 3) Si no hay UUID válido o no se encontró, contrastar por SKU
+            //    Heurísticas: userData.sku, nombre del mesh, nombre del material
+            if (!mesh) {
+                const skuLower = String(sku).toLowerCase();
+                const skuMatches = allMeshes.filter(m => {
+                    const userDataSku = (m.userData && (m.userData.sku || m.userData.SKU)) ? String(m.userData.sku || m.userData.SKU).toLowerCase() : '';
+                    const nameStr = m.name ? String(m.name).toLowerCase() : '';
+                    const matName = m.material && m.material.name ? String(m.material.name).toLowerCase() : '';
+                    return (
+                        userDataSku === skuLower ||
+                        nameStr.includes(skuLower) ||
+                        matName.includes(skuLower)
+                    );
+                });
+
+                if (skuMatches.length > 0) {
+                    mesh = skuMatches[0];
+                }
+            }
+
+            if (!mesh || !mesh.isMesh) throw new Error('No se encontró un mesh que coincida con el UUID/SKU proporcionado');
+
+            // 4) Obtener info del material por SKU
+            const res = await fetch(`/api/materials/${sku}`);
+            if (!res.ok) throw new Error(`Material ${sku} no encontrado`);
+            const materialData = await res.json();
+
+            // 5) Construir path y opciones
+            const texturePath = `/materials/${sku}/${materialData.files?.color || sku + '.png'}`;
+            const options = { 
+                ...(this.getMaterialOptions(materialData) || {}), 
+                ...(optionsOverride || {}),
+                loadPBR: this.pbrEnabled  // Ensure PBR flag is respected
+            };
+
+            // 6) Guardar para undo
+            const previousMaterial = mesh.material ? mesh.material.clone() : null;
+
+            // 7) Aplicar usando el pipeline existente (array de un solo item)
+            await this.experience.model.applyTextureToGroup([mesh], texturePath, options);
+
+            // 8) Registrar acción
+            this.recordAction({
+                type: 'textureApplication',
+                meshes: [mesh],
+                previousMaterials: [previousMaterial],
+                material: { id: sku, name: materialData.nombre || sku },
+                materialPath: texturePath,
+                options
+            });
+
+            // 9) Mostrar propiedades opcionalmente
+            if (this.PropiedadesMateriales) {
+                this.PropiedadesMateriales.showPropertyBox(sku);
+            }
+
+            // 10) Guardar vinculación de SKU a UUID
+
+            // Verificar si ese objeto ya tiene un vinculo con algun material
+            const existingLink = this.selection.find(link => link.uuid === uuid);
+            if (existingLink) {
+                // Si ya existe, actualizar el SKU
+                existingLink.sku = sku;
+            } else {
+                // Si no existe, agregar nuevo vínculo
+                this.selection.push({ sku, uuid });
+            }
+
+            console.log(this.selection);
+            
+            // Actualizar datos del proyecto cuando se modifica la escena
+            if (this.sendProjectData) {
+                this.sendProjectData.actualizarDatos(this.selection);
+            }
+
+            return true;
+        } catch (err) {
+            console.error('Error aplicando SKU a UUID:', err);
+            this.showError(err.message || 'Error aplicando material');
+            return false;
+        }
+    }
+
+        /**
+     * Controls PBR (Physically Based Rendering) state for performance optimization
+     * @param {boolean} state - true to enable PBR, false to disable for better performance
+     */
+    setPBR(state) {
+        this.pbrEnabled = state;
+        
+        if (!this.experience.model || !this.experience.model.model) {
+            console.warn('No model loaded to apply PBR changes');
+            return;
+        }
+        
+        this.selection.forEach(link => {
+            this.applySkuToMeshByUUID(link.sku, link.uuid);
+        });
+
+        if (state === false) {
+            // Disable PBR: Remove PBR maps from all materials
+            this.experience.lighting.setQuality('low'); // Set lighting quality to low for performance
+        } else {
+            // Enable PBR: Try to reload PBR maps for materials that had them
+            this.experience.lighting.setQuality('high'); // Set lighting quality to high for quality
+        }
+
+        this.showSuccess(`PBR ${state ? 'activado' : 'desactivado'} - ${state ? 'Calidad visual mejorada' : 'Rendimiento optimizado'}`);
+    }
+
+    /**
+     * Disable PBR maps on meshes for better performance
+     * @param {Array} meshes - Array of mesh objects
+     */
+    disablePBROnMeshes(meshes) {
+        meshes.forEach(mesh => {
+            const material = mesh.material;
+            if (!material) return;
+
+            // Store original PBR maps in userData for later restoration
+            if (!material.userData.originalPBRMaps) {
+                material.userData.originalPBRMaps = {
+                    normalMap: material.normalMap,
+                    roughnessMap: material.roughnessMap,
+                    metalnessMap: material.metalnessMap,
+                    specularIntensityMap: material.specularIntensityMap,
+                    aoMap: material.aoMap,
+                    displacementMap: material.displacementMap,
+                    // Store original values too
+                    normalScale: material.normalScale ? material.normalScale.clone() : null,
+                    aoMapIntensity: material.aoMapIntensity,
+                    displacementScale: material.displacementScale,
+                    displacementBias: material.displacementBias,
+                    specularIntensity: material.specularIntensity,
+                    clearcoat: material.clearcoat,
+                    clearcoatRoughness: material.clearcoatRoughness
+                };
+            }
+
+            // Remove PBR maps (keep only the diffuse/color map)
+            material.normalMap = null;
+            material.roughnessMap = null;
+            material.metalnessMap = null;
+            material.specularIntensityMap = null;
+            material.aoMap = null;
+            material.displacementMap = null;
+
+            // Reset PBR values to simple defaults
+            if (material.normalScale) material.normalScale.set(0, 0);
+            material.aoMapIntensity = 0;
+            material.displacementScale = 0;
+            material.displacementBias = 0;
+            material.specularIntensity = 0;
+            material.clearcoat = 0;
+            material.clearcoatRoughness = 0;
+
+            // Set simple base values for basic shading
+            material.metalness = 0.1;
+            material.roughness = 0.8;
+
+            material.needsUpdate = true;
+        });
+    }
+
+    /**
+     * Enable PBR maps on meshes for better visual quality
+     * @param {Array} meshes - Array of mesh objects
+     */
+    enablePBROnMeshes(meshes) {
+        meshes.forEach(mesh => {
+            const material = mesh.material;
+            if (!material || !material.userData.originalPBRMaps) return;
+
+            const originalMaps = material.userData.originalPBRMaps;
+
+            // Restore original PBR maps if they existed
+            material.normalMap = originalMaps.normalMap;
+            material.roughnessMap = originalMaps.roughnessMap;
+            material.metalnessMap = originalMaps.metalnessMap;
+            material.specularIntensityMap = originalMaps.specularIntensityMap;
+            material.aoMap = originalMaps.aoMap;
+            material.displacementMap = originalMaps.displacementMap;
+
+            // Restore original PBR values
+            if (originalMaps.normalScale) {
+                material.normalScale.copy(originalMaps.normalScale);
+            }
+            material.aoMapIntensity = originalMaps.aoMapIntensity || 1.0;
+            material.displacementScale = originalMaps.displacementScale || -0.05;
+            material.displacementBias = originalMaps.displacementBias || -0.05;
+            material.specularIntensity = originalMaps.specularIntensity || 1.0;
+            material.clearcoat = originalMaps.clearcoat || 0.0;
+            material.clearcoatRoughness = originalMaps.clearcoatRoughness || 0.1;
+
+            material.needsUpdate = true;
+        });
+    }
+
+    /**
+     * Get material options with PBR flag consideration
+     * @param {Object} materialData - Material data object
+     * @returns {Object} Material options
+     */
+    getMaterialOptions(materialData) {
+        const options = {
+            id: materialData.nombre,
+            name: materialData.nombre,
+            repeat: 1.0,
+            metalness: materialData.pbrSettings?.metalness || 0.3,
+            roughness: materialData.pbrSettings?.roughness || 0.5,
+            anchoMuestra: 0.6,
+            tiling: undefined,
+            isGlass: false,
+            loadPBR: this.pbrEnabled  // Use the PBR state flag
+        };
+
+        // Aplicar configuraciones específicas por material
+        switch(materialData.nombre) {
+            case 'Cristal':
+                options.isGlass = true;
+                break;
+
+            default: 
+                break;
+        }
+
+        return options;
+    }
+
+    setupUndoSystem() {
+        // Add keyboard listener for Ctrl+Z and PBR toggle
+        document.addEventListener('keydown', (event) => {
+            if ((event.ctrlKey || event.metaKey) && event.key === 'z' && !event.shiftKey) {
+                event.preventDefault();
+                this.undo();
+            }
+            // Add P key for PBR toggle
+            if (event.key === 'p' || event.key === 'P') {
+                event.preventDefault();
+                this.togglePBR();
+            }
+        });
+    }
+
+    recordAction(action) {
+        // Add action to history
+        this.actionHistory.push({
+            ...action,
+            timestamp: Date.now()
+        });
+        
+        // Limit history size
+        if (this.actionHistory.length > this.maxHistorySize) {
+            this.actionHistory.shift();
+        }
+    }
+
+    undo() {
+        if (this.actionHistory.length === 0) {
+            console.log('No hay acciones para deshacer');
+            return;
+        }
+        
+        const lastAction = this.actionHistory.pop();
+        console.log('Deshaciendo:', lastAction.type);
+        
+        try {
+            switch (lastAction.type) {
+                case 'textureApplication':
+                    this.revertTextureApplication(lastAction);
+                    this.showUndoFeedback('Textura revertida');
+                    break;
+                default:
+                    console.warn('Tipo de acción no soportado para deshacer:', lastAction.type);
+                    break;
+            }
+        } catch (error) {
+            console.error('Error al deshacer acción:', error);
+            this.showUndoFeedback('Error al deshacer');
+        }
+    }
+
+    revertTextureApplication(action) {
+        if (!action.meshes || !action.previousMaterials) {
+            console.warn('Datos insuficientes para revertir la aplicación de textura');
+            return;
+        }
+        
+        // Restore previous materials to meshes
+        action.meshes.forEach((mesh, index) => {
+            if (mesh && action.previousMaterials[index]) {
+                try {
+                    mesh.material = action.previousMaterials[index];
+                    console.log('Material revertido para mesh:', mesh.name || mesh.uuid);
+                } catch (error) {
+                    console.error('Error revirtiendo material para mesh:', mesh.name || mesh.uuid, error);
+                }
+            }
+        });
+        
+        // Update UI if needed - remove selection from material items
+        if (action.materialItem) {
+            action.materialItem.classList.remove('selected');
+        }
+        
+        // Hide properties panel if it was shown
+        if (this.PropiedadesMateriales && action.showedProperties) {
+            this.PropiedadesMateriales.hidePropertyBox();
+        }
+        
+        console.log('Textura revertida exitosamente');
+   }
+
+    // Método para obtener información sobre el historial de acciones
+    getUndoInfo() {
+        return {
+            canUndo: this.actionHistory.length > 0,
+            historySize: this.actionHistory.length,
+            lastAction: this.actionHistory.length > 0 ? this.actionHistory[this.actionHistory.length - 1] : null
+        };
+    }
+    
+    // Método para limpiar el historial (útil para reiniciar el estado)
+    clearHistory() {
+        this.actionHistory = [];
+        console.log('Historial de acciones limpiado');
+    }
+    
+    // Método para mostrar un mensaje temporal de undo
+    showUndoFeedback(message = 'Acción deshecha') {
+        // Crear elemento de feedback
+        const feedback = document.createElement('div');
+        feedback.style.position = 'fixed';
+        feedback.style.top = '20px';
+        feedback.style.right = '20px';
+        feedback.style.background = 'rgba(76, 175, 80, 0.9)';
+        feedback.style.color = 'white';
+        feedback.style.padding = '12px 20px';
+        feedback.style.borderRadius = '8px';
+        feedback.style.fontSize = '14px';
+        feedback.style.fontWeight = 'bold';
+        feedback.style.zIndex = '2000';
+        feedback.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
+        feedback.style.transform = 'translateX(100%)';
+        feedback.style.transition = 'transform 0.3s ease';
+        feedback.innerHTML = `↶ ${message}`;
+        
+        document.body.appendChild(feedback);
+        
+        // Animar entrada
+        setTimeout(() => {
+            feedback.style.transform = 'translateX(0)';
+        }, 10);
+        
+        // Animar salida y remover
+        setTimeout(() => {
+            feedback.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                if (feedback.parentNode) {
+                    document.body.removeChild(feedback);
+                }
+            }, 300);
+        }, 2000);
+    }
+
     
     init() {
         function loadStylesheet(url) {
@@ -67,7 +719,7 @@ export default class ClientInterface extends EventEmitter {
                 {
                     name: "modeloBase",
                     type: "gltfModel",
-                    path:  `http://localhost:5173/projects/${this.configDir}/model.glb`
+                    path:  `/projects/${this.configDir}/model.glb`
                 },
                 {
                     name: "sky",
@@ -291,7 +943,7 @@ export default class ClientInterface extends EventEmitter {
                 tabButton.classList.add('tab-button');
                 tabButton.textContent = id; // Use a more user-friendly label if available
                 tabButtons.push(tabButton);
-                tabsContainer.appendChild(tabButton);
+                tabsContain-er.appendChild(tabButton);
                 
                 // Set first tab as active by default
                 if (index === 0) {
@@ -730,7 +1382,8 @@ export default class ClientInterface extends EventEmitter {
                 roughness: 0.6,
                 anchoMuestra: 0.6,
                 tiling: undefined,
-                isGlass: false
+                isGlass: false,
+                loadPBR: this.pbrEnabled  // Use the PBR state flag
             };
 
                 switch(material.name){
@@ -742,6 +1395,17 @@ export default class ClientInterface extends EventEmitter {
             }
             console.log(material)
             await this.experience.model.applyTextureToGroup(meshes, material.path, options);
+            
+            // Record material applications in the new tracking system
+            meshes.forEach(mesh => {
+                this.recordMaterialApplication(
+                    mesh.name,
+                    mesh.uuid,
+                    material.id,
+                    material.path,
+                    options
+                );
+            });
             
             // Registrar acción para undo
             this.recordAction({
@@ -755,6 +1419,11 @@ export default class ClientInterface extends EventEmitter {
             });
             
             // Status messages disabled, so no success message shown
+            
+            // Actualizar datos del proyecto cuando se modifica la escena
+            if (this.sendProjectData) {
+                this.sendProjectData.actualizarDatos(this.selection);
+            }
         } catch (error) {
             console.error('Error applying texture:', error);
             // Status messages disabled, so no error shown
@@ -1084,9 +1753,28 @@ refreshPresetsForCurrentTab(configDir) {
             materialsBtn.parentNode.removeChild(materialsBtn);
         }
         
+        // Remove PBR toggle button
+        const pbrBtn = document.getElementById('togglePBRBtn');
+        if (pbrBtn && pbrBtn.parentNode) {
+            pbrBtn.parentNode.removeChild(pbrBtn);
+        }
+        
+        // Cleanup SendProjectData
+        if (this.sendProjectData) {
+            this.sendProjectData.destroy();
+        }
+        
         // Clear global reference
         if (window.materialsManager === this.materialsManager) {
             window.materialsManager = null;
+        }
+        
+        // Clear PBR global references
+        if (window.setPBR) {
+            window.setPBR = null;
+        }
+        if (window.togglePBR) {
+            window.togglePBR = null;
         }
         
         // Remove keyboard event listeners (note: we can't remove specific listeners easily, 
@@ -1136,444 +1824,157 @@ refreshPresetsForCurrentTab(configDir) {
         }
     }
     
-    getMaterialOptions(materialData) {
-        const options = {
-            id: materialData.nombre,
-            name: materialData.nombre,
-            repeat: 1.0,
-            metalness: materialData.pbrSettings.metalness,
-            roughness: materialData.pbrSettings.roughness,
-            anchoMuestra: 0.6,
-            tiling: undefined,
-            isGlass: false
-        };
-
-        // Aplicar configuraciones específicas por material
-        switch(materialData.nombre) {
-            case 'Cristal':
-                options.isGlass = true;
-                break;
-
-            default: 
-                break;
+    /**
+     * Clears all materials from the scene and resets material tracking
+     * This should be used instead of manually setting material = null for each object
+     */
+    clearAllMaterials() {
+        if (!this.experience.model || !this.experience.model.model) {
+            console.warn('No model loaded to clear materials from');
+            return;
         }
 
-        return options;
-    }
-
-    setupUndoSystem() {
-        // Add keyboard listener for Ctrl+Z
-        document.addEventListener('keydown', (event) => {
-            if ((event.ctrlKey || event.metaKey) && event.key === 'z' && !event.shiftKey) {
-                event.preventDefault();
-                this.undo();
+        const modelRoot = this.experience.model.model;
+        const clearedMeshes = [];
+        
+        // Traverse and clear all materials
+        modelRoot.traverse((obj) => {
+            if (obj && obj.isMesh && obj.material) {
+                // Store reference for logging
+                clearedMeshes.push({
+                    name: obj.name,
+                    uuid: obj.uuid,
+                    previousMaterial: obj.material
+                });
+                
+                // Clear the material
+                obj.material = null;
             }
         });
+        
+        // Clear the material history tracking
+        this.appliedMaterialsHistory = [];
+        
+        // Clear undo history since materials are reset
+        this.clearHistory();
+        
+        console.log(`Cleared materials from ${clearedMeshes.length} meshes and reset tracking`);
+        
+        return clearedMeshes;
     }
-
-    recordAction(action) {
-        // Add action to history
-        this.actionHistory.push({
-            ...action,
+    
+    /**
+     * Records a material application for PBR state management
+     * @param {string} meshName - Name of the mesh
+     * @param {string} meshUuid - UUID of the mesh  
+     * @param {string} sku - Material SKU
+     * @param {string} materialPath - Path to the material
+     * @param {Object} options - Material application options
+     */
+    recordMaterialApplication(meshName, meshUuid, sku, materialPath, options) {
+        // Remove any existing entry for this mesh (by name or UUID)
+        this.appliedMaterialsHistory = this.appliedMaterialsHistory.filter(
+            entry => entry.meshName !== meshName && entry.meshUuid !== meshUuid
+        );
+        
+        // Add new entry
+        this.appliedMaterialsHistory.push({
+            meshName: meshName,
+            meshUuid: meshUuid,
+            sku: sku,
+            materialPath: materialPath,
+            originalOptions: { ...options }, // Store original options
             timestamp: Date.now()
         });
         
-        // Limit history size
-        if (this.actionHistory.length > this.maxHistorySize) {
-            this.actionHistory.shift();
-        }
+        console.log(`Recorded material application: ${sku} on ${meshName} (${meshUuid})`);
     }
-
-    undo() {
-        if (this.actionHistory.length === 0) {
-            console.log('No hay acciones para deshacer');
-            return;
+    
+    /**
+     * Finds a mesh by name or UUID in the model
+     * @param {string} identifier - Mesh name or UUID
+     * @returns {Object|null} Found mesh or null
+     */
+    findMeshByIdentifier(identifier) {
+        if (!this.experience.model || !this.experience.model.model) {
+            return null;
         }
         
-        const lastAction = this.actionHistory.pop();
-        console.log('Deshaciendo:', lastAction.type);
-        
-        try {
-            switch (lastAction.type) {
-                case 'textureApplication':
-                    this.revertTextureApplication(lastAction);
-                    this.showUndoFeedback('Textura revertida');
-                    break;
-                default:
-                    console.warn('Tipo de acción no soportado para deshacer:', lastAction.type);
-                    break;
-            }
-        } catch (error) {
-            console.error('Error al deshacer acción:', error);
-            this.showUndoFeedback('Error al deshacer');
-        }
-    }
-
-    revertTextureApplication(action) {
-        if (!action.meshes || !action.previousMaterials) {
-            console.warn('Datos insuficientes para revertir la aplicación de textura');
-            return;
-        }
-        
-        // Restore previous materials to meshes
-        action.meshes.forEach((mesh, index) => {
-            if (mesh && action.previousMaterials[index]) {
-                try {
-                    mesh.material = action.previousMaterials[index];
-                    console.log('Material revertido para mesh:', mesh.name || mesh.uuid);
-                } catch (error) {
-                    console.error('Error revirtiendo material para mesh:', mesh.name || mesh.uuid, error);
-                }
+        let foundMesh = null;
+        this.experience.model.model.traverse((obj) => {
+            if (obj && obj.isMesh && (obj.name === identifier || obj.uuid === identifier)) {
+                foundMesh = obj;
             }
         });
         
-        // Update UI if needed - remove selection from material items
-        if (action.materialItem) {
-            action.materialItem.classList.remove('selected');
-        }
-        
-        // Hide properties panel if it was shown
-        if (this.PropiedadesMateriales && action.showedProperties) {
-            this.PropiedadesMateriales.hidePropertyBox();
-        }
-        
-        console.log('Textura revertida exitosamente');
-   }
+        return foundMesh;
+    }
+    
 
-    // Método para obtener información sobre el historial de acciones
-    getUndoInfo() {
-        return {
-            canUndo: this.actionHistory.length > 0,
-            historySize: this.actionHistory.length,
-            lastAction: this.actionHistory.length > 0 ? this.actionHistory[this.actionHistory.length - 1] : null
-        };
-    }
-    
-    // Método para limpiar el historial (útil para reiniciar el estado)
-    clearHistory() {
-        this.actionHistory = [];
-        console.log('Historial de acciones limpiado');
-    }
-    
-    // Método para mostrar un mensaje temporal de undo
-    showUndoFeedback(message = 'Acción deshecha') {
-        // Crear elemento de feedback
-        const feedback = document.createElement('div');
-        feedback.style.position = 'fixed';
-        feedback.style.top = '20px';
-        feedback.style.right = '20px';
-        feedback.style.background = 'rgba(76, 175, 80, 0.9)';
-        feedback.style.color = 'white';
-        feedback.style.padding = '12px 20px';
-        feedback.style.borderRadius = '8px';
-        feedback.style.fontSize = '14px';
-        feedback.style.fontWeight = 'bold';
-        feedback.style.zIndex = '2000';
-        feedback.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
-        feedback.style.transform = 'translateX(100%)';
-        feedback.style.transition = 'transform 0.3s ease';
-        feedback.innerHTML = `↶ ${message}`;
-        
-        document.body.appendChild(feedback);
-        
-        // Animar entrada
-        setTimeout(() => {
-            feedback.style.transform = 'translateX(0)';
-        }, 10);
-        
-        // Animar salida y remover
-        setTimeout(() => {
-            feedback.style.transform = 'translateX(100%)';
-            setTimeout(() => {
-                if (feedback.parentNode) {
-                    document.body.removeChild(feedback);
-                }
-            }, 300);
-        }, 2000);
+
+    /**
+     * Toggles PBR state
+     */
+    togglePBR() {
+        const newState = !this.pbrEnabled;
+        this.setPBR(newState);
+        this.updatePBRButtonUI();
     }
 
-    setupMaterialsIntegration() {
-        // Make materialsManager globally accessible for the modal buttons
-        window.materialsManager = this.materialsManager;
+    /**
+     * Updates the PBR toggle button UI
+     */
+    updatePBRButtonUI() {
+        if (!this.pbrToggleBtn) return;
         
-        // Setup the materials modal
-        this.materialsManager.setupMaterialsModal();
-        
-        // Create materials button in the UI
-        this.createMaterialsButton();
-        
-        // Override material application to work with ClientInterface
-        this.customizeMaterialsManagerForClient();
-
-        // Load materials
-        this.materialsManager.loadMaterials();
+        const btn = this.pbrToggleBtn;
+        btn.innerHTML = this.pbrEnabled ? '✨ PBR ON' : '⚡ PBR OFF';
+        btn.style.background = this.pbrEnabled ? 'var(--mm-success, #4CAF50)' : 'var(--mm-warning, #FF9800)';
+        btn.style.boxShadow = this.pbrEnabled ? 
+            '0 4px 12px rgba(76, 175, 80, 0.3)' : 
+            '0 4px 12px rgba(255, 152, 0, 0.3)';
     }
     
-    createMaterialsButton() {
-        // Create floating button for materials
-        const materialsBtn = document.createElement('button');
-        materialsBtn.id = 'showMaterialsBtn';
-        materialsBtn.className = 'floating-materials-btn';
-        materialsBtn.innerHTML = '📚 Materiales';
-        materialsBtn.title = 'Abrir catálogo de materiales';
+    /**
+     * Method to be called when applying presets that replace all materials
+     * This clears the scene and resets tracking, then applies preset materials
+     * @param {Array} presetMaterials - Array of preset material applications
+     */
+    async applyPresetMaterials(presetMaterials) {
+        // Clear all existing materials and reset tracking
+        this.clearAllMaterials();
         
-        // Style the button
-        materialsBtn.style.position = 'fixed';
-        materialsBtn.style.top = '20px';
-        materialsBtn.style.right = '20px';
-        materialsBtn.style.zIndex = '1000';
-        materialsBtn.style.padding = '12px 20px';
-        materialsBtn.style.background = 'var(--mm-panel)';
-        materialsBtn.style.color = 'white';
-        materialsBtn.style.border = 'none';
-        materialsBtn.style.borderRadius = '25px';
-        materialsBtn.style.cursor = 'pointer';
-        materialsBtn.style.fontSize = '14px';
-        materialsBtn.style.fontWeight = 'bold';
-        materialsBtn.style.boxShadow = '0 4px 12px rgba(143, 92, 255, 0.3)';
-        materialsBtn.style.transition = 'all 0.3s ease';
+        console.log('Applying preset with', presetMaterials.length, 'materials');
         
-        // Add hover effects
-        materialsBtn.addEventListener('mouseenter', () => {
-            materialsBtn.style.background = 'var(--mm-panel)';
-            materialsBtn.style.transform = 'translateY(-2px)';
-            materialsBtn.style.boxShadow = '0 6px 16px rgba(143, 92, 255, 0.4)';
-        });
-        
-        materialsBtn.addEventListener('mouseleave', () => {
-            materialsBtn.style.background = 'var(--mm-panel)';
-            materialsBtn.style.transform = 'translateY(0)';
-            materialsBtn.style.boxShadow = '0 4px 12px rgba(143, 92, 255, 0.3)';
-        });
-
-        materialsBtn.addEventListener("click", () => {
-            document.getElementById("materialsFloatingModal").classList.toggle("hidden")
-        });
-        
-        document.body.appendChild(materialsBtn);
-    }
-    
-    customizeMaterialsManagerForClient() {
-        // Store reference to original renderMaterials method
-        const originalRenderMaterials = this.materialsManager.renderMaterials.bind(this.materialsManager);
-        
-        // Override renderMaterials to add client-specific click behavior
-        this.materialsManager.renderMaterials = (materials) => {
-            originalRenderMaterials(materials);
-            
-            // Add client-specific behavior to material cards
-            this.setupClientMaterialCardBehavior();
-        };
-    }
-    
-    setupClientMaterialCardBehavior() {
-        const materialCards = document.querySelectorAll('.material-card');
-        
-        materialCards.forEach(card => {
-            // Remove existing click listeners
-            const newCard = card.cloneNode(true);
-            card.parentNode.replaceChild(newCard, card);
-            
-            // Add client-specific click behavior
-            newCard.addEventListener('click', (e) => {
-                e.stopPropagation();
+        // Apply each preset material and track it
+        for (const presetMaterial of presetMaterials) {
+            try {
+                const mesh = this.findMeshByIdentifier(presetMaterial.meshName) || 
+                           this.findMeshByIdentifier(presetMaterial.meshUuid);
                 
-                // Clear any active selection
-                this.clearActiveSelection();
-                
-                // Set up material selection mode
-                const sku = newCard.getAttribute('sku');
-                this.setupMaterialSelection(sku, newCard);
-            });
-        });
-    }
-    
-    async setupMaterialSelection(sku, materialCard) {
-        try {
-            // Get material data
-            const response = await fetch(`/api/materials/${sku}`);
-            if (!response.ok) {
-                throw new Error('Material not found');
-            }
-            
-            const materialData = await response.json();
-            
-            // Visual feedback
-            materialCard.classList.add('selecting');
-            document.body.style.cursor = 'crosshair';
-            
-            // Store active selection
-            this.activeSelection = {
-                sku: sku,
-                materialData: materialData,
-                materialCard: materialCard
-            };
-            
-            // Create next click handler
-            const nextClickHandler = (event) => {
-                event.stopPropagation();
-                this.handleMaterialApplication(event);
-            };
-            
-            // Add event listener
-            document.addEventListener('click', nextClickHandler, { once: true });
-            this.activeSelection.nextClickHandler = nextClickHandler;
-            
-        } catch (error) {
-            console.error('Error setting up material selection:', error);
-            this.showError('Error cargando material: ' + error.message);
-        }
-    }
-    
-    handleMaterialApplication(event) {
-        try {
-            // Check if we have a hovered object to apply material to
-            if (this.experience.postProcessing && this.experience.postProcessing.hoveredObject) {
-                const targetMeshes = Array.isArray(this.experience.postProcessing.hoveredObject) 
-                    ? this.experience.postProcessing.hoveredObject 
-                    : [this.experience.postProcessing.hoveredObject];
-                
-                // Apply material using the same method as the original ClientInterface
-                this.applyMaterialToHoveredObject(targetMeshes);
-                
-            } else {
-                console.warn('No hay objeto seleccionado para aplicar el material');
-                this.showWarning('Selecciona un objeto primero haciendo hover sobre él');
-            }
-        } catch (error) {
-            console.error('Error aplicando material:', error);
-            this.showError('Error aplicando material: ' + error.message);
-        } finally {
-            this.clearActiveSelection();
-        }
-    }
-    
-    applyMaterialToHoveredObject(targetMeshes) {
-        if (!this.activeSelection || !this.activeSelection.materialData) {
-            return;
-        }
-        
-        const materialData = this.activeSelection.materialData;
-        const materialCard = this.activeSelection.materialCard;
-        
-        // Create material object compatible with existing system
-        const material = {
-            id: this.activeSelection.sku,
-            name: materialData.nombre || this.activeSelection.sku,
-            path: `/materials/${this.activeSelection.sku}/${materialData.files?.color || this.activeSelection.sku + '.png'}`
-        };
-        
-        // Save previous materials for undo
-        const previousMaterials = targetMeshes.map(mesh => mesh.material ? mesh.material.clone() : null);
-        
-        // Get material options
-        const options = this.getMaterialOptions(materialData);
-        
-        // Apply texture using existing method
-        this.experience.model.applyTextureToGroup(targetMeshes, material.path, options);
-        
-        // Record action for undo
-        this.recordAction({
-            type: 'textureApplication',
-            meshes: targetMeshes,
-            previousMaterials: previousMaterials,
-            material: material,
-            materialPath: material.path,
-            options: options,
-            materialItem: materialCard,
-            showedProperties: this.PropiedadesMateriales ? true : false
-        });
-        
-        // Update UI
-        const allCards = document.querySelectorAll('.material-card');
-        allCards.forEach(card => card.classList.remove('selected'));
-        materialCard.classList.add('selected');
-        
-        // Show properties if available
-        if (this.PropiedadesMateriales) {
-            this.PropiedadesMateriales.showPropertyBox(material.id);
-        }
-        
-        // Show success feedback
-        this.showSuccess(`Material ${materialData.nombre || this.activeSelection.sku} aplicado`);
-    }
-
-    // Apply a material by SKU to a mesh identified by UUID
-    async applySkuToMeshByUUID(sku, uuid, optionsOverride = {}) {
-        try {
-            if (!sku) throw new Error('SKU es requerido');
-            const modelRoot = this.experience?.model?.model;
-            if (!modelRoot) throw new Error('Modelo no disponible');
-            // 1) Mapear todos los objetos (meshes) en escena y sus hijos
-            const allMeshes = [];
-            modelRoot.traverse((obj) => {
-                if (obj && obj.isMesh) allMeshes.push(obj);
-            });
-
-            // 2) Intentar localizar por UUID primero
-            let mesh = null;
-            if (uuid) {
-                mesh = allMeshes.find(m => m.name === uuid) || null;
-            }
-
-            // 3) Si no hay UUID válido o no se encontró, contrastar por SKU
-            //    Heurísticas: userData.sku, nombre del mesh, nombre del material
-            if (!mesh) {
-                const skuLower = String(sku).toLowerCase();
-                const skuMatches = allMeshes.filter(m => {
-                    const userDataSku = (m.userData && (m.userData.sku || m.userData.SKU)) ? String(m.userData.sku || m.userData.SKU).toLowerCase() : '';
-                    const nameStr = m.name ? String(m.name).toLowerCase() : '';
-                    const matName = m.material && m.material.name ? String(m.material.name).toLowerCase() : '';
-                    return (
-                        userDataSku === skuLower ||
-                        nameStr.includes(skuLower) ||
-                        matName.includes(skuLower)
+                if (mesh && presetMaterial.materialPath) {
+                    const options = {
+                        ...presetMaterial.options,
+                        loadPBR: this.pbrEnabled // Respect current PBR setting
+                    };
+                    
+                    await this.experience.model.applyTextureToGroup([mesh], presetMaterial.materialPath, options);
+                    
+                    // Track the application
+                    this.recordMaterialApplication(
+                        mesh.name,
+                        mesh.uuid,
+                        presetMaterial.sku || 'preset-material',
+                        presetMaterial.materialPath,
+                        options
                     );
-                });
-
-                if (skuMatches.length > 0) {
-                    mesh = skuMatches[0];
                 }
+            } catch (error) {
+                console.warn('Failed to apply preset material:', error);
             }
-
-            if (!mesh || !mesh.isMesh) throw new Error('No se encontró un mesh que coincida con el UUID/SKU proporcionado');
-
-            // 4) Obtener info del material por SKU
-            const res = await fetch(`/api/materials/${sku}`);
-            if (!res.ok) throw new Error(`Material ${sku} no encontrado`);
-            const materialData = await res.json();
-
-            // 5) Construir path y opciones
-            const texturePath = `/materials/${sku}/${materialData.files?.color || sku + '.png'}`;
-            const options = { ...(this.getMaterialOptions(materialData) || {}), ...(optionsOverride || {}) };
-
-            // 6) Guardar para undo
-            const previousMaterial = mesh.material ? mesh.material.clone() : null;
-
-            // 7) Aplicar usando el pipeline existente (array de un solo item)
-            await this.experience.model.applyTextureToGroup([mesh], texturePath, options);
-
-            // 8) Registrar acción
-            this.recordAction({
-                type: 'textureApplication',
-                meshes: [mesh],
-                previousMaterials: [previousMaterial],
-                material: { id: sku, name: materialData.nombre || sku },
-                materialPath: texturePath,
-                options
-            });
-
-            // 9) Mostrar propiedades opcionalmente
-            if (this.PropiedadesMateriales) {
-                this.PropiedadesMateriales.showPropertyBox(sku);
-            }
-
-            return true;
-        } catch (err) {
-            console.error('Error aplicando SKU a UUID:', err);
-            this.showError(err.message || 'Error aplicando material');
-            return false;
         }
+        
+        console.log('Preset applied successfully. Tracking', this.appliedMaterialsHistory.length, 'materials');
     }
 }
 

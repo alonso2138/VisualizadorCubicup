@@ -10,9 +10,19 @@ export class StepManager {
         this.materialsManager = materialsManager;
         this.presetsManager = presetsManager;
         this.maxSteps = 4;
+        
+        // Edit mode properties
+        this.isEditMode = false;
+        this.editingExperience = null;
+        this.modelReplaced = false;
     }
 
-    loadStep(step) {
+    loadStep(step, experience = null) {
+        // Set edit mode if experience is provided
+        if (experience) {
+            this.isEditMode = true;
+            this.editingExperience = experience;
+        }
         const stepContent = document.getElementById('stepContent');
         const prevBtn = document.getElementById('prevStep');
         const nextBtn = document.getElementById('nextStep');
@@ -38,10 +48,17 @@ export class StepManager {
         // Load step content
         switch(step) {
             case 1:
-                stepContent.innerHTML = this.renderer.renderStep1();
-                this.fileUploadManager.attachFileDropListeners();
-                // Disable next button until file is uploaded
-                nextBtn.disabled = true;
+                if (this.isEditMode && this.editingExperience && !this.modelReplaced) {
+                    stepContent.innerHTML = this.renderer.renderStep1EditMode(this.editingExperience);
+                    this.setupEditModeStep1();
+                    // Enable next button since we already have a model
+                    nextBtn.disabled = false;
+                } else {
+                    stepContent.innerHTML = this.renderer.renderStep1();
+                    this.fileUploadManager.attachFileDropListeners();
+                    // Disable next button until file is uploaded
+                    nextBtn.disabled = true;
+                }
                 break;
                 
             case 2:
@@ -57,15 +74,29 @@ export class StepManager {
                 break;
                 
             case 4:
-                stepContent.innerHTML = this.renderer.renderStep4();
-                this.setupStep4();
+                if (this.isEditMode && this.editingExperience) {
+                    stepContent.innerHTML = this.renderer.renderStep4EditMode(this.editingExperience);
+                    this.setupStep4EditMode();
+                } else {
+                    stepContent.innerHTML = this.renderer.renderStep4();
+                    this.setupStep4();
+                }
                 break;
         }
     }
 
     async initializeModelPreview() {
         const container = document.getElementById('threeContainer');
-        const filePath = this.fileUploadManager.getUploadedFilePath();
+        let filePath = null;
+        
+        // Determine which model to load
+        if (this.isEditMode && this.editingExperience && !this.modelReplaced) {
+            // Load existing model from experience
+            filePath = `/${this.editingExperience.id}/${this.editingExperience.file || this.editingExperience.id + '.glb'}`;
+        } else {
+            // Load uploaded file
+            filePath = this.fileUploadManager.getUploadedFilePath();
+        }
         
         if (!container || !filePath) {
             console.error('Cannot initialize model preview - missing container or file path');
@@ -76,9 +107,15 @@ export class StepManager {
         
         if (success) {
             this.setupModelViewerControls();
+            
             // Setup materials modal if materialsManager is available
             if (this.materialsManager) {
                 this.materialsManager.setupMaterialsModal();
+                
+                // If in edit mode, load existing presets/materials
+                if (this.isEditMode && this.editingExperience) {
+                    await this.loadExistingConfiguration();
+                }
             }
 
             if (this.presetsManager) {
@@ -156,6 +193,36 @@ export class StepManager {
         }
     }
 
+    async setupStep4EditMode() {
+        // Cannot go back no more
+        document.getElementById("prevStep").disabled = true;
+        
+        // The link is already set in the renderer, but we can update it here if needed
+        const linkInput = document.getElementById('generatedExperienceLink');
+        if (linkInput && this.editingExperience) {
+            linkInput.value = `http://localhost:5173/viewer?project=${this.editingExperience.id}`;
+        }
+
+        // If this is edit mode, we don't need to create a new experience,
+        // just update the existing one (this will be handled in ExperienceManager)
+    }
+
+    async loadExistingConfiguration() {
+        // Load existing presets and materials configuration
+        try {
+            // This would load the existing configuration from the API
+            // For now, we'll leave it as a placeholder for future implementation
+            console.log('Loading existing configuration for experience:', this.editingExperience.id);
+            
+            // TODO: Implement loading of existing materials and presets
+            // const existingConfig = await this.apiService.getExperienceConfiguration(this.editingExperience.id);
+            // this.materialsManager.loadConfiguration(existingConfig.materials);
+            // this.presetsManager.loadConfiguration(existingConfig.presets);
+        } catch (error) {
+            console.error('Error loading existing configuration:', error);
+        }
+    }
+
     handleStepNavigation(action) {
         switch(action) {
             case 'next-step':
@@ -192,7 +259,12 @@ export class StepManager {
     canGoToNextStep() {
         switch(this.currentStep) {
             case 1:
-                // Can proceed if file is uploaded
+                // In edit mode, we can always proceed (we have an existing model)
+                // unless we're replacing and haven't uploaded yet
+                if (this.isEditMode && !this.modelReplaced) {
+                    return true;
+                }
+                // Otherwise, can proceed if file is uploaded
                 return this.fileUploadManager.hasUploadedFile();
             case 2:
                 // Can proceed if model is loaded
@@ -239,9 +311,32 @@ export class StepManager {
         }
     }
 
+    setupEditModeStep1() {
+        // Setup optional file replacement in edit mode
+        const fileDropZone = document.getElementById('fileDropZone');
+        const fileInput = document.getElementById('fileInput');
+        
+        if (fileDropZone && fileInput) {
+            // Setup the file drop listeners for optional replacement
+            this.fileUploadManager.attachFileDropListeners();
+            
+            // Override the file upload success handler to mark model as replaced
+            const originalOnFileUploaded = this.onFileUploaded.bind(this);
+            this.onFileUploaded = (uploadResult) => {
+                if (uploadResult.success) {
+                    this.modelReplaced = true;
+                }
+                originalOnFileUploaded(uploadResult);
+            };
+        }
+    }
+
     // Reset step manager state
     reset() {
         this.currentStep = 1;
+        this.isEditMode = false;
+        this.editingExperience = null;
+        this.modelReplaced = false;
         this.fileUploadManager.reset();
         this.modelViewer.cleanup();
         if (this.materialsManager) {
@@ -260,6 +355,19 @@ export class StepManager {
 
     isLastStep() {
         return this.currentStep === this.maxSteps;
+    }
+
+    // Getters for edit mode
+    getEditingExperience() {
+        return this.editingExperience;
+    }
+
+    isInEditMode() {
+        return this.isEditMode;
+    }
+
+    hasModelBeenReplaced() {
+        return this.modelReplaced;
     }
 
     // Utility methods

@@ -661,7 +661,7 @@ export class ModelViewer {
         // Get mesh in question
         let mesh;
         this.loadedModel.children.forEach((child)=>{
-            if(child.uuid && child.uuid == UUID) mesh=child;
+            if(child.name && child.name == UUID) mesh=child;
         });
 
         if(!mesh) throw("No se ha encontrado en el modelo cargado el UUID del objeto objetivo")

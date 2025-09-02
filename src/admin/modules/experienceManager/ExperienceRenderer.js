@@ -43,6 +43,73 @@ export class ExperienceRenderer {
         `;
     }
 
+    renderStep1EditMode(experience) {
+        return `
+            <div class="step-1 edit-mode">
+                <h4>Modelo actual: ${experience.name || experience.id}</h4>
+                
+                <div class="current-model-info">
+                    <div class="model-card">
+                        <div class="model-icon">📦</div>
+                        <div class="model-details">
+                            <p class="model-name"><strong>Archivo:</strong> ${experience.file || experience.id + '.glb'}</p>
+                            <p class="model-date"><strong>Creado:</strong> ${new Date(experience.date).toLocaleDateString()}</p>
+                            <p class="model-status"><strong>Estado:</strong> <span class="status-active">Activo</span></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="edit-options">
+                    <p class="edit-info">
+                        ℹ️ Estás editando una experiencia existente. El modelo actual se mantendrá 
+                        y podrás modificar sus materiales y configuraciones en los siguientes pasos.
+                    </p>
+                    
+                    <div class="replace-model-section" style="margin-top: 20px;">
+                        <details>
+                            <summary class="replace-toggle">🔄 Reemplazar modelo (opcional)</summary>
+                            <div class="replace-content">
+                                <p class="replace-warning">
+                                    ⚠️ Si subes un nuevo modelo, se reemplazará el actual y perderás todas las configuraciones de materiales.
+                                </p>
+                                
+                                <div class="file-drop-zone" id="fileDropZone">
+                                    <div class="drop-content">
+                                        <div class="upload-icon">📁</div>
+                                        <p>Arrastra tu nuevo archivo GLB aquí o haz clic para seleccionar</p>
+                                        <p class="file-hint">Archivos soportados: .glb (máximo 100MB)</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="file-info" id="fileInfo" style="display: none;">
+                                    <div class="file-details">
+                                        <div class="file-icon">📦</div>
+                                        <div class="file-meta">
+                                            <p class="file-name" id="fileName"></p>
+                                            <p class="file-size" id="fileSize"></p>
+                                        </div>
+                                        <button class="btn-remove" id="removeFileBtn" title="Eliminar archivo">🗑️</button>
+                                    </div>
+                                    
+                                    <div class="upload-progress" id="uploadProgress" style="display: none;">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" id="progressFill"></div>
+                                        </div>
+                                        <p class="progress-text" id="progressText">Subiendo...</p>
+                                    </div>
+                                </div>
+                                
+                                <input type="file" id="fileInput" accept=".glb" style="display: none;">
+                            </div>
+                        </details>
+                    </div>
+                </div>
+                
+                <div class="file-error" id="fileError" style="display: none;"></div>
+            </div>
+        `;
+    }
+
     renderStep2() {
         return `
             <div class="step-2">
@@ -110,6 +177,75 @@ export class ExperienceRenderer {
             </div>
         `;
     }
+
+    renderStep4EditMode(experience) {
+        return `
+            <div class="step-4 edit-mode">
+                <h4>🎉 Experiencia actualizada con éxito</h4>
+                
+                <div class="success-content">
+                    <div class="success-icon">✅</div>
+                    <p class="success-message">Tu experiencia <strong>${experience.name || experience.id}</strong> ha sido actualizada correctamente</p>
+                    
+                    <div class="generated-link">
+                        <label>Link de la experiencia:</label>
+                        <div class="link-container">
+                            <input type="text" readonly value="http://localhost:5173/viewer?project=${experience.id}" id="generatedExperienceLink">
+                            <button class="btn btn-sm" data-action="copy-generated-link" title="Copiar enlace">📋</button>
+                        </div>
+                    </div>
+                    
+                    <div class="success-actions">
+                        <button class="btn btn-primary" data-action="back-to-dashboard">
+                            Volver al Dashboard
+                        </button>
+                        <button class="btn btn-secondary" onclick="window.open('http://localhost:5173/viewer?project=${experience.id}', '_blank')">
+                            Abrir Experiencia
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    renderEditExperienceModal(experience) {
+        return `
+            <div class="modal-header">
+                <h3>Editar experiencia: ${experience.name || experience.id}</h3>   
+                <button class="modal-close" data-action="close-modal">×</button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="step-container">
+                    <div class="step-header">
+                        <div class="step-indicators">
+                            <div class="step active" data-step="1">1</div>
+                            <div class="step" data-step="2">2</div>
+                            <div class="step" data-step="3">3</div>
+                            <div class="step" data-step="4">4</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step-content" id="stepContent">
+                        <!-- Dynamic step content -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="prevStep" style="display: none;">
+                    Anterior
+                </button>
+                <button class="btn btn-primary" id="nextStep">
+                    Siguiente
+                </button>
+                <button class="btn btn-success" id="finishStep" style="display: none;" data-action="update-experience">
+                    Actualizar Experiencia
+                </button>
+            </div>
+        `;
+    }
+
 
     renderExperiencesList(experiences) {
         if (!experiences || experiences.length === 0) {

@@ -9,7 +9,7 @@ export default class Lightning {
     this.scene = scene;
     this.renderer = renderer;
     this.resources = resources; // Añadir referencia a los recursos
-    
+
     // Opciones por defecto para iluminación hiperrealista
     this.options = {
       // Configuración general
@@ -83,6 +83,9 @@ export default class Lightning {
       // Helpers (para desarrollo)
       helpers: options.helpers !== undefined ? options.helpers : false
     };
+
+    // Crear una copia profunda de las opciones originales para referencia
+    this.originalOptions = JSON.parse(JSON.stringify(this.options));
     
     // Colecciones para almacenar luces
     this.lights = {
@@ -242,7 +245,7 @@ export default class Lightning {
     this._updateHelpers();
   }
 
-  _updateHelpers() {
+  _updateHelpers() {  
     // First remove any existing helpers
     if(this.lights.rim) if(this.lights.rim.helper) this.scene.remove(this.lights.rim.helper);
     
@@ -255,13 +258,12 @@ export default class Lightning {
   _initialize() {
     // Configuración de sombras según calidad
     this._setupShadowQuality();
-    
+
+    // Poner calidad
+    this.setQuality(this.options.quality);
+
     // Crear luces
-    this._createMainLight();
-    this._createFillLight();
-    this._createRimLight();
-    this._createAmbientLight();
-    this._createPointLights();
+    this.updateLights();
 
     // Cargar environment map para IBL (Image Based Lighting)
     if (this.options.environmentMap) {
@@ -416,7 +418,6 @@ export default class Lightning {
   }
   
   _setupEnvironmentMap() {
-    console.log("setup")
 
     if (!this.options.environmentMap) return;
     const rgbeLoader = new RGBELoader();
@@ -678,7 +679,30 @@ export default class Lightning {
       this.scene.add(light);
     }
   }
-  
+
+  setQuality(quality) {
+    // Set options to normal
+    this.options = JSON.parse(JSON.stringify(this.originalOptions));
+
+    // Update quality and reinitialize lights
+    this.options.quality = quality;
+
+    switch(this.options.quality) {
+      case 'low':
+        this.options.pointLights = false;
+        this.options.ambientIntensity += 0.3;
+        break;
+      
+      case 'high':
+      break;
+
+      default:break;
+    }
+    
+    // Recreate lights with new quality settings
+    this.updateLights();
+  }
+
   // Método para actualizar en cada frame (por si se necesita alguna animación)
   update(time) {
     if (this.options.mainLightRotate && this.lights.main) {

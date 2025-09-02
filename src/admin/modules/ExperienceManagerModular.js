@@ -92,6 +92,44 @@ export class ExperienceManager {
         grid.innerHTML = this.renderer.renderExperiencesList(this.experiences);
     }
 
+
+    async showEditExperienceModal(experienceId) {
+        const experience = this.experiences.find(exp => exp.id === experienceId);   
+        if (!experience) {
+            console.error('Experience not found:', experienceId);
+            return;
+        }
+
+        const modal = document.getElementById('modalOverlay');
+        const content = document.getElementById('modalContent');
+        if (!modal || !content) {
+            console.error('Modal elements not found');
+            return;
+        }
+
+        try {
+            // Get detailed experience data
+            const experienceDetails = await this.apiService.getExperienceDetails(experienceId);
+            
+            // Reset modules for editing experience
+            this.resetModules();
+            
+            // Show modal with edit content
+            content.innerHTML = this.renderer.renderEditExperienceModal(experienceDetails);
+            modal.style.display = 'flex';
+            modal.classList.add('active');
+            
+            // Load first step with existing data
+            this.stepManager.loadStep(1, experienceDetails);
+            
+            // Setup modal event listeners for edit mode
+            this.setupEditModalEventListeners(experienceDetails);
+        } catch (error) {
+            console.error('Error loading experience for editing:', error);
+            this.adminInterface.showNotification('Error al cargar la experiencia para edición', 'error');
+        }
+    }       
+
     showExperienceDetails(experienceId) {
         const experience = this.experiences.find(exp => exp.id === experienceId);
         if (!experience) {
@@ -351,5 +389,85 @@ export class ExperienceManager {
                 );
             }
         }
+    }
+
+    setupEditModalEventListeners(experience) {
+        // Step navigation buttons
+        const prevBtn = document.getElementById('prevStep');
+        const nextBtn = document.getElementById('nextStep');
+        const finishBtn = document.getElementById('finishStep');
+
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+                this.stepManager.handleStepNavigation('prev-step');
+            });
+        }
+
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                this.stepManager.handleStepNavigation('next-step');
+            });
+        }
+
+        if (finishBtn) {
+            finishBtn.addEventListener('click', async () => {
+                await this.updateExperience(experience);
+            });
+        }
+    }
+
+    async updateExperience(experience) {
+        try {
+            // Collect updated experience data
+            const updateData = this.collectUpdateExperienceData(experience);
+            
+            // Update experience via API
+            const result = await this.apiService.updateExperience(experience.id, updateData);
+            
+            if (result.success) {
+                // Move to final step
+                this.stepManager.loadStep(4, experience);
+                
+                // Refresh experiences list
+                await this.loadExperiences();
+                
+                // Show success notification
+                this.adminInterface.showNotification('Experiencia actualizada correctamente', 'success');
+            } else {
+                throw new Error(result.message || 'Error updating experience');
+            }
+        } catch (error) {
+            console.error('Error updating experience:', error);
+            this.adminInterface.showNotification('Error al actualizar la experiencia', 'error');
+        }
+    }
+
+    collectUpdateExperienceData(experience) {
+        const baseData = {
+            id: experience.id,
+            name: experience.name,
+            date: new Date().toISOString(), // Update modification date
+            step: this.stepManager.getCurrentStep()
+        };
+
+        // If model was replaced, include new model data
+        if (this.stepManager.hasModelBeenReplaced()) {
+            baseData.model = this.fileUploadManager.getUploadedFilePath();
+            baseData.file = this.fileUploadManager.getSelectedFile()?.name;
+        }
+
+        // Include presets if available
+        if (this.presetsManager && this.presetsManager.Presets) {
+            baseData.presets = this.presetsManager.Presets;
+        }
+
+        // Include materials configuration if available
+        if (this.materialsManager) {
+            // TODO: Get materials configuration from materialsManager
+            // baseData.materials = this.materialsManager.getCurrentMaterials();
+        }
+
+        console.log('Update data collected:', baseData);
+        return baseData;
     }
 }

@@ -162,6 +162,24 @@ export class ApiService {
         }
     }
 
+    async getExperienceDetails(id) {
+        try {
+            const response = await fetch(`${this.baseUrl}/projects/${id}/details`);
+            
+            if (!response.ok) {
+                // Fallback to basic info if detailed endpoint doesn't exist
+                return await this.getExperienceById(id);
+            }
+            
+            const experienceDetails = await response.json();
+            return experienceDetails;
+        } catch (error) {
+            console.error('Error loading experience details:', error);
+            // Fallback to basic info
+            return await this.getExperienceById(id);
+        }
+    }
+
     // Utility method to build URLs
     buildUrl(endpoint) {
         return `${this.baseUrl}${endpoint.startsWith('/') ? endpoint : '/' + endpoint}`;

@@ -89,7 +89,7 @@ export default class Experience extends EventEmitter{
             this.renderer, 
             this.resources, 
             {
-                quality: 'high',
+                quality: 'low',
                 shadows: true,
                 helpers: false,
 
@@ -130,7 +130,7 @@ export default class Experience extends EventEmitter{
                 fillLightTarget: { x: 0, y: 0, z: 0 },
 
                 // Rim SpotLight - profile behind/above
-                rimLight: true,
+                rimLight: false,
                 rimLightColor: 0xFFF5E8,
                 rimLightIntensity: 11,
                 rimLightPosition: { x: -0.1, y: 0, z: -1 },

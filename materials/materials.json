@@ -43,15 +43,15 @@
       "formato": "60x60",
       "acabado": "Mate",
       "pbrSettings": {
-        "metalness": 0.11,
-        "roughness": 0.63,
+        "metalness": 0,
+        "roughness": 0.49,
         "normalScale": 0.8,
         "aoIntensity": 1.2,
         "enableNormal": true,
         "enableRoughness": true,
         "enableMetalness": true,
         "enableAO": true,
-        "updatedAt": "2025-08-01T15:46:52.039Z",
+        "updatedAt": "2025-08-30T20:05:32.073Z",
         "enableColor": true
       },
       "previewConfig": {
@@ -77,8 +77,8 @@
         "roughness": "madera_Roughness.jpg"
       },
       "pbrSettings": {
-        "metalness": 0.16,
-        "roughness": 0.71,
+        "metalness": 0.12,
+        "roughness": 0.43,
         "normalScale": 1.1,
         "aoIntensity": 0,
         "enableNormal": true,
@@ -86,7 +86,7 @@
         "enableMetalness": true,
         "enableAO": true,
         "enableColor": true,
-        "updatedAt": "2025-08-03T16:49:09.054Z"
+        "updatedAt": "2025-08-19T10:39:14.052Z"
       },
       "createdAt": "2025-08-03T16:49:15.809Z",
       "updatedAt": "2025-08-03T16:49:15.809Z"
@@ -158,6 +158,73 @@
       },
       "createdAt": "2025-08-07T16:42:00.999Z",
       "updatedAt": "2025-08-07T16:42:00.999Z"
+    },
+    "madera1": {
+      "nombre": "madera1",
+      "color": "",
+      "formato": "90x20cm",
+      "hashtags": [
+        "suelo",
+        "madera",
+        "neutrals"
+      ],
+      "etiquetas": [
+        "suelo",
+        "madera",
+        "neutrals"
+      ],
+      "objetos_recomendados": [],
+      "tipo": "textura",
+      "files": {
+        "color": "madera1_Color.png",
+        "metalness": "madera1_Metalness.jpg",
+        "normal": "madera1_Normal.jpg",
+        "roughness": "madera1_Roughness.jpg"
+      },
+      "pbrSettings": {
+        "metalness": 0.09,
+        "roughness": 0.57,
+        "normalScale": 1,
+        "aoIntensity": 0,
+        "enableNormal": true,
+        "enableRoughness": true,
+        "enableMetalness": true,
+        "enableAO": true,
+        "enableColor": true,
+        "updatedAt": "2025-08-13T10:14:05.416Z"
+      },
+      "createdAt": "2025-08-13T10:14:40.705Z",
+      "updatedAt": "2025-08-13T10:14:40.705Z"
+    },
+    "Cristal": {
+      "nombre": "Cristal",
+      "color": "",
+      "formato": "",
+      "hashtags": [],
+      "etiquetas": [],
+      "objetos_recomendados": [],
+      "tipo": "textura",
+      "files": {
+        "color": "Cristal_Color.png",
+        "metalness": "Cristal_Metalness.jpg",
+        "normal": "Cristal_Normal.jpg",
+        "roughness": "Cristal_Roughness.jpg"
+      },
+      "pbrSettings": {
+        "metalness": 0.5,
+        "roughness": 0.5,
+        "normalScale": 1,
+        "aoIntensity": 0,
+        "enableColor": true,
+        "enableNormal": true,
+        "enableRoughness": true,
+        "enableMetalness": true,
+        "enableAO": true,
+        "isTemporary": true,
+        "createdAt": "2025-08-17T11:15:22.753Z"
+      },
+      "createdAt": "2025-08-17T11:16:34.242Z",
+      "updatedAt": "2025-08-17T11:16:34.242Z"
     }
   }
 }

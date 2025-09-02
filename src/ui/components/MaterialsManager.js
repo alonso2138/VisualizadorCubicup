@@ -230,12 +230,12 @@ export class MaterialsManager {
                 </div>
                 <div class="material-actions">
                     <button class="btn-material-action btn-preview" 
-                            onclick="window.materialsManager?.showMaterialInfo('${sku}')" 
+                            onclick="event.stopPropagation(); window.materialsManager?.showMaterialInfo('${sku}')" 
                             title="Ver información">
                         ℹ️ Info
                     </button>
                     <button class="btn-material-action btn-preview" 
-                            onclick="window.materialsManager?.showMaterialPreview('${sku}')" 
+                            onclick="event.stopPropagation(); window.materialsManager?.showMaterialPreview('${sku}')" 
                             title="Vista previa">
                         👁️ Preview
                     </button>

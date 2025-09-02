@@ -1,15 +1,39 @@
 {
   "experienceId": "Neutrals",
-  "createdAt": "2025-08-11T15:09:39.561Z",
+  "createdAt": "2025-08-18T07:26:11.177Z",
   "presets": [
     [
+      {
+        "uuid": "Panel_del_sistema_Vidriado_6867328",
+        "sku": "Cristal"
+      },
+      {
+        "uuid": "Muro_básico_P_TABIQUE_PLADUR_48_WR_6824911002",
+        "sku": "0278900022977"
+      },
+      {
+        "uuid": "Suelo_Porcelánico_6834061001",
+        "sku": "madera1"
+      },
       {
         "uuid": "Muro_básico_P_TABIQUE_PLADUR_48_WR_6824911001",
         "sku": "0358401839213"
       },
       {
-        "uuid": "Suelo_Porcelánico_6834061001",
+        "uuid": "DUCHA_GRIF_EMPOTRADA_PLATO_90_x_160_CM_2_6827589",
         "sku": "VANOGR2020"
+      },
+      {
+        "uuid": "LAVABO_80_CM_-_GRIF_EMPOTRADA_6866239002",
+        "sku": "0350901839213"
+      },
+      {
+        "uuid": "INODORO_TANQUE_BAJO_ADOSADO_A_PARED_6852166",
+        "sku": "0358401839213"
+      },
+      {
+        "uuid": "LAVABO_80_CM_-_GRIF_EMPOTRADA_6866239",
+        "sku": "madera"
       }
     ]
   ],

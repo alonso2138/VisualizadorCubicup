@@ -1765,289 +1765,153 @@
     background: #e2e8f0;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .uploader-content {
-        padding: 1rem;
-    }
-    
-    .file-drop-zone {
-        padding: 2rem 1rem;
-    }
-    
-    .material-preview-container {
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-        gap: 0.75rem;
-    }
-    
-    .materials-list {
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-        gap: 0.75rem;
-    }
-    
-    .materials-header {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .materials-controls {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .search-box input {
-        width: 100%;
-    }
-    
-    .bulk-actions {
-        flex-direction: column;
-        gap: 1rem;
-        align-items: stretch;
-    }
-    
-    .bulk-buttons {
-        justify-content: center;
-    }
-    
-    .action-buttons {
-        flex-direction: column;
-    }
+/* =====================================================
+   EDIT MODE STYLES
+   ===================================================== */
+
+.step-1.edit-mode {
+    padding: 1.5rem 0;
 }
 
-/* Material selection styles */
-.material-checkbox-container {
-    position: absolute;
-    top: 8px;
-    left: 8px;
-    z-index: 10;
+.current-model-info {
+    margin-bottom: 2rem;
 }
 
-.material-checkbox {
-    display: none;
-}
-
-.checkbox-label {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    background: rgba(255, 255, 255, 0.9);
-    border: 2px solid #ddd;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    position: relative;
-}
-
-.checkbox-label::after {
-    content: '';
-    position: absolute;
-    top: 2px;
-    left: 6px;
-    width: 6px;
-    height: 10px;
-    border: solid #fff;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
-    opacity: 0;
-    transition: opacity 0.2s ease;
-}
-
-.material-checkbox:checked + .checkbox-label {
-    background: #007bff;
-    border-color: #007bff;
-}
-
-.material-checkbox:checked + .checkbox-label::after {
-    opacity: 1;
-}
-
-.checkbox-label:hover {
-    border-color: #007bff;
-    transform: scale(1.1);
-}
-
-/* Header actions */
-.materials-header-actions {
+.model-card {
     display: flex;
     align-items: center;
-    gap: 8px;
-}
-
-.btn-select-all {
-    background: transparent;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    padding: 6px 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    color: #666;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.btn-select-all:hover {
-    border-color: #007bff;
-    color: #007bff;
-    background: rgba(0, 123, 255, 0.1);
-}
-
-.btn-select-all.all-selected {
-    background: #007bff;
-    border-color: #007bff;
-    color: white;
-}
-
-/* Selection info */
-.selection-info {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 8px;
-    padding: 8px 12px;
-    background: rgba(0, 123, 255, 0.1);
-    border-radius: 6px;
-    font-size: 14px;
-    color: #007bff;
-}
-
-.btn-clear-selection {
-    background: transparent;
-    border: 1px solid #007bff;
-    color: #007bff;
-    padding: 4px 8px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 12px;
-    transition: all 0.2s ease;
-}
-
-.btn-clear-selection:hover {
-    background: #007bff;
-    color: white;
-}
-
-/* Enhanced edit modal */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(4px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 2000;
-}
-
-.modal-content {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    width: 90vw;
-    max-width: 600px;
-    max-height: 90vh;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem;
-    border-bottom: 1px solid #e2e8f0;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-}
-
-.modal-header h3 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #1e293b;
-    margin: 0;
-}
-
-.modal-close {
-    width: 32px;
-    height: 32px;
-    border: none;
-    border-radius: 8px;
-    background: #e2e8f0;
-    color: #64748b;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.25rem;
-    transition: all 0.2s ease;
-}
-
-.modal-close:hover {
-    background: #cbd5e1;
-    color: #1e293b;
-}
-
-.modal-body {
-    flex: 1;
-    padding: 1.5rem;
-    overflow-y: auto;
-}
-
-.modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.75rem;
-    padding: 1.5rem;
-    border-top: 1px solid #e2e8f0;
+    gap: 1rem;
+    padding: 1.25rem;
     background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 0.75rem;
+    transition: border-color 0.2s ease;
 }
 
-/* Material name overlay */
-.material-name-overlay {
-    position: absolute;
-    top: 8px;
-    left: 8px;
-    z-index: 5;
-    background: rgba(0, 0, 0, 0.7);
+.model-card:hover {
+    border-color: #cbd5e1;
+}
+
+.model-icon {
+    font-size: 2rem;
+    background: #3b82f6;
     color: white;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    max-width: calc(100% - 16px);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.material-sku {
-    display: block;
-}
-
-/* Adjust material card height to be automatic */
-.material-card-modern {
-    height: auto;
-    min-height: auto;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 0.5rem;
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
-.material-card-modern .material-thumbnail {
+.model-details {
     flex: 1;
-    min-height: 120px;
-    position: relative;
 }
 
-/* Remove bottom info section styles that were causing fixed height */
-.material-info-compact {
-    display: none; /* Hide the bottom section completely */
+.model-name, .model-date, .model-status {
+    margin: 0.25rem 0;
+    font-size: 0.875rem;
 }
 
-/* Ensure thumbnail takes full card space */
-.materials-floating-grid .material-card-modern {
-    aspect-ratio: 1;
-    height: auto;
+.status-active {
+    color: #10b981;
+    font-weight: 600;
+}
+
+.edit-options {
+    margin-top: 1.5rem;
+}
+
+.edit-info {
+    background: #dbeafe;
+    border: 1px solid #93c5fd;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    color: #1e40af;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+.replace-model-section {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.replace-toggle {
+    background: #f9fafb;
+    padding: 1rem;
+    cursor: pointer;
+    user-select: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    font-weight: 500;
+    color: #374151;
+    transition: background-color 0.2s ease;
+}
+
+.replace-toggle:hover {
+    background: #f3f4f6;
+}
+
+.replace-content {
+    padding: 1rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.replace-warning {
+    background: #fef3cd;
+    border: 1px solid #fbbf24;
+    border-radius: 0.375rem;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    color: #92400e;
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
+.step-4.edit-mode .success-content {
+    text-align: center;
+    padding: 2rem 1rem;
+}
+
+.step-4.edit-mode .success-message {
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+}
+
+/* Modal header for edit mode */
+.modal-header h3 {
+    color: #1f2937;
+    font-weight: 600;
+}
+
+/* Enhanced step indicators for edit mode */
+.step-container .step-header {
+    margin-bottom: 2rem;
+}
+
+.step-indicators .step.active {
+    background: #3b82f6;
+    color: white;
+}
+
+/* Responsive adjustments for edit mode */
+@media (max-width: 768px) {
+    .model-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.75rem;
+    }
+    
+    .edit-info {
+        padding: 0.75rem;
+        font-size: 0.8rem;
+    }
+    
+    .replace-content {
+        padding: 0.75rem;
+    }
 }

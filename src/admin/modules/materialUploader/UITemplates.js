@@ -7,8 +7,7 @@ export class UITemplates {
                     <button class="btn-back" data-action="back-to-dashboard">
                         ← Volver al dashboard
                     </button>
-                    <h2><i class="fas fa-cube"></i> Material Uploader</h2>
-                    <p>Sistema de gestión de materiales con generación PBR y preview 3D</p>
+                    <h2><i class="fas fa-cube"></i>Materiales</h2>
                 </div>
 
                 <div class="tab-navigation">
