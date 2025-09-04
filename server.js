@@ -90,6 +90,16 @@ app.get('/admin', (req, res) => {
   }
 });
 
+// Serve 3D project files with correct MIME type for .glb
+const PROJECTS_DIR = path.join(__dirname, "projects");
+app.use("/projects", express.static(PROJECTS_DIR, {
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith(".glb")) {
+      res.type("model/gltf-binary"); // opcional pero correcto
+    }
+  }
+}));
+
 // Initialize MaterialUploader module
 initMaterialUploader();
 
