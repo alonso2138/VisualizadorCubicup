@@ -705,7 +705,7 @@ export default class ClientInterface extends EventEmitter {
             // Cargar el archivo JSON desde la carpeta uploads (verificar formato correcto)
             // DEPLOY: /api/projects/${encodeURIComponent(configDir)}
             // DEV: http://localhost:3000/api/projects/${encodeURIComponent(configDir)}
-            const response = await fetch(window.SERVER_URL+`/api/projects/${encodeURIComponent(this.configDir)}`);
+            const response = await fetch(`/api/projects/${encodeURIComponent(this.configDir)}`);
 
             if (!response.ok) {
                 throw new Error(`Error cargando configuración: ${response.statusText}`);

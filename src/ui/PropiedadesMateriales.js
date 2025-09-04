@@ -12,7 +12,7 @@ export default class PropiedadesMateriales extends EventEmitter {
 
     async init() {
         // Cargamos JSON del servidor
-        const response = await fetch(window.SERVER_URL + '/api/libro-azul');
+        const response = await fetch('/api/libro-azul');
         this.data = await response.json();
     }
 
